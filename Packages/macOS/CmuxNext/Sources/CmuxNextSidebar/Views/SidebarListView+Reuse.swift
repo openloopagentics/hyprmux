@@ -1,4 +1,5 @@
 import AppKit
+import CmuxNextDesign
 // Row view reuse through `rowPool`: views exist only for rows near the
 // viewport, and leaving rows return to the pool.
 extension SidebarListView {
