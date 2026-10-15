@@ -359,6 +359,7 @@ final class SidebarListView: NSView {
             rowViews[row.key] = view
         }
         pruneOffscreen()
+        if PerfDiag.noScrollHover { return }
         updateHover()
     }
     func pruneOffscreen() {

@@ -86,7 +86,7 @@ public final class StatusIndicatorView: NSView, StatusIndicatorConfigClient {
     private func refresh() {
         var config = StatusIndicatorAppearance.shared.config
         if ignoresScaleSetting { config.settings.scale = 1 }
-        let animates = window != nil && isWindowVisible && config.animatesLoops
+        let animates = window != nil && isWindowVisible && config.animatesLoops && !PerfDiag.noLoops
         let plan = StatusIndicatorPlan.make(state, style: config.style(hint: styleHint), animates: animates, set: config.iconSet)
         let showed = showsGlyph
         indicator.apply(plan, config: config)

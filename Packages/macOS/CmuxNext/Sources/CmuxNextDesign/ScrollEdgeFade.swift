@@ -77,7 +77,7 @@ public final class ScrollEdgeFadeView: NSView {
         let center = NotificationCenter.default
         for name in [NSView.boundsDidChangeNotification, NSView.frameDidChangeNotification] {
             observers.append(center.addObserver(forName: name, object: clip, queue: .main) { [weak self] _ in
-                MainActor.assumeIsolated { self?.updateFade() } // main-proof: observer on queue: .main
+                MainActor.assumeIsolated { PerfDiag.staticFade ? self?.updateEdges() : self?.updateFade() } // main-proof: observer on queue: .main
             })
         }
         updateFade(animated: false)
@@ -147,6 +147,7 @@ public final class ScrollEdgeFadeView: NSView {
     /// Re-reads the scroll position.
     public func updateFade(animated: Bool = true) {
         guard let layer else { return }
+        if PerfDiag.noFade { layer.mask = nil; return }
         observeDocument(scrollView.documentView)
         let next = Self.hiddenEdges(of: scrollView)
         let fade = min(Metrics.scrollEdgeFade / max(layer.bounds.height, 1), CGFloat(ChromeTunables.scrollFadeMaxFraction.value))
@@ -163,6 +164,14 @@ public final class ScrollEdgeFadeView: NSView {
         edges = next
         // The band's opacity fades; geometry above never animates.
         Motion.transaction(animated ? .hover : nil) { fadeMask.colors = Self.colors(for: next) }
+    }
+
+    private func updateEdges() {
+        guard !PerfDiag.noFade else { return }
+        let next = Self.hiddenEdges(of: scrollView)
+        guard next != edges else { return }
+        edges = next
+        Motion.transaction(.hover) { fadeMask.colors = Self.colors(for: next) }
     }
 
     private func observeDocument(_ document: NSView?) {

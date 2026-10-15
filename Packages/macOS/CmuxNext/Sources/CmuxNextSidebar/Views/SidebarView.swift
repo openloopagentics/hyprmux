@@ -225,6 +225,7 @@ public final class SidebarView: NSView {
 
     private func clipBoundsChanged() {
         list.realizeVisibleRows()
+        if PerfDiag.noScrollHover { return }
         PointerHover.refresh(in: window)
     }
 
