@@ -27,6 +27,7 @@ final class SidebarListView: NSView {
     /// Recycled row views by class; only rows near the viewport have views.
     var rowPool = SidebarRowViewPool()
     var hoveredKey: SidebarRowKey?
+    var hoverSnaps = false
     /// Workspace hover card (title, cwd, CPU and memory).
     let hoverCard = WorkspaceHoverCardController()
     var press: Press?
@@ -124,6 +125,8 @@ final class SidebarListView: NSView {
         }
     }
     override var isFlipped: Bool { true }
+    override var wantsUpdateLayer: Bool { PerfDiag.listUpdateLayer }
+    override func updateLayer() {}
     override var acceptsFirstResponder: Bool { true }
     var metrics: SidebarLayoutMetrics { .standard }
     var inset: CGFloat { SidebarStyle.horizontalInset }
@@ -360,7 +363,9 @@ final class SidebarListView: NSView {
         }
         pruneOffscreen()
         if PerfDiag.noScrollHover { return }
+        hoverSnaps = PerfDiag.hoverSnap
         updateHover()
+        hoverSnaps = false
     }
     func pruneOffscreen() {
         let keepRect = realizationRect().insetBy(dx: 0, dy: -SidebarStyle.overscan)
@@ -411,8 +416,8 @@ final class SidebarListView: NSView {
     }
     func setHovered(_ key: SidebarRowKey?) {
         guard key != hoveredKey else { return }
-        if let hoveredKey { rowViews[hoveredKey]?.isHovered = false }
+        if let hoveredKey, let view = rowViews[hoveredKey] { view.isHovered = false; if hoverSnaps { view.fadesNextFill = false; view.fadesNextHover = false } }
         hoveredKey = key
-        if let key { rowViews[key]?.isHovered = true }
+        if let key, let view = rowViews[key] { view.isHovered = true; if hoverSnaps { view.fadesNextFill = false; view.fadesNextHover = false } }
     }
 }

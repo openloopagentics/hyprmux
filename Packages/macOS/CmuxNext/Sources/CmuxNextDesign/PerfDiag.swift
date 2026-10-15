@@ -7,5 +7,8 @@ public nonisolated enum PerfDiag {
     public static let staticFade = flag("CMUX_PERF_STATIC_FADE")
     public static let noScrollHover = flag("CMUX_PERF_NO_SCROLL_HOVER")
     public static let noLoops = flag("CMUX_PERF_NO_LOOPS")
+    public static let noPark = flag("CMUX_PERF_NO_PARK")
+    public static let listUpdateLayer = flag("CMUX_PERF_LIST_UPDATE_LAYER")
+    public static let hoverSnap = flag("CMUX_PERF_HOVER_SNAP")
     private static func flag(_ name: String) -> Bool { ProcessInfo.processInfo.environment[name] == "1" }
 }

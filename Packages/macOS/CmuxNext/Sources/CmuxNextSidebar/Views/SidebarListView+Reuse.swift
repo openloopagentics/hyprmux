@@ -16,7 +16,7 @@ extension SidebarListView {
     /// (16% of the main thread while scrolling 1,000 rows, perf round 2). A view in another superview
     /// (a lift) leaves it, and a view the pool evicts leaves the list.
     func recycle(_ view: SidebarRowView) {
-        if view.superview === self { view.isHidden = true } else { view.removeFromSuperview() }
+        if view.superview === self, !PerfDiag.noPark { view.isHidden = true } else { view.removeFromSuperview() }
         for evicted in rowPool.put(view) where evicted.superview === self { evicted.removeFromSuperview() }
     }
     /// Per-key callbacks, set on every dequeue so recycled views never keep
