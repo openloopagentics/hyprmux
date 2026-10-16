@@ -209,6 +209,14 @@ enum AgenticKeymap {
     }
 
     static func handle(event: NSEvent, tabManager: TabManager?) -> Bool {
+        if let h = FileHandle(forWritingAtPath: "/tmp/agentic-keys.log") ?? {
+            FileManager.default.createFile(atPath: "/tmp/agentic-keys.log", contents: nil)
+            return FileHandle(forWritingAtPath: "/tmp/agentic-keys.log")
+        }() {
+            h.seekToEndOfFile()
+            h.write("key \(event.keyCode) flags=\(event.modifierFlags.rawValue) tm=\(tabManager != nil)\n".data(using: .utf8)!)
+            h.closeFile()
+        }
         guard let tabManager else { return false }
         let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
             .subtracting([.numericPad, .function, .capsLock])
@@ -239,7 +247,10 @@ enum AgenticKeymap {
             case Code.right: tabManager.movePaneFocus(direction: .right); return true
             case Code.up: tabManager.movePaneFocus(direction: .up); return true
             case Code.down: tabManager.movePaneFocus(direction: .down); return true
-            case Code.ret: _ = tabManager.createSplit(direction: .right); return true
+            case Code.ret:
+                let outcome = tabManager.createSplitOutcome(direction: .right)
+                try? "split outcome=\(outcome) sel=\(String(describing: tabManager.selectedWorkspace?.focusedPanelId)) tabs=\(tabManager.tabs.count)\n".appendLine(to: "/tmp/agentic-keys.log")
+                return true
             case Code.minus: AgenticActions.resize(.left, in: tabManager); return true
             case Code.equal: AgenticActions.resize(.right, in: tabManager); return true
             case Code.lbracket: AgenticActions.cycleSub(-1, in: tabManager); return true
@@ -403,5 +414,12 @@ struct AgenticBottomBar: View {
             }
         }
         .buttonStyle(.plain)
+    }
+}
+
+extension String {
+    func appendLine(to path: String) throws {
+        let h = try FileHandle(forWritingTo: URL(fileURLWithPath: path))
+        h.seekToEndOfFile(); h.write(data(using: .utf8)!); h.closeFile()
     }
 }
