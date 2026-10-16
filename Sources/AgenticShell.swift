@@ -705,13 +705,28 @@ struct AgenticTitlebarHost: NSViewRepresentable {
         override func viewDidMoveToWindow() {
             super.viewDidMoveToWindow()
             hideControls()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in self?.hideControls() }
+            for delay in [0.3, 1.0, 3.0] { DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in self?.hideControls(); self?.dump() } }
+        }
+        func dump() {
+            guard let w = window else { return }
+            var out = "title=\(w.title) style=\(w.styleMask.rawValue) titleVis=\(w.titleVisibility.rawValue)\n"
+            for a in w.titlebarAccessoryViewControllers {
+                out += "accessory id=\(a.view.identifier?.rawValue ?? "nil") layout=\(a.layoutAttribute.rawValue) hidden=\(a.isHidden) frame=\(a.view.frame)\n"
+            }
+            func walk(_ v: NSView, _ d: Int) {
+                out += String(repeating: " ", count: d) + "\(type(of: v)) \(v.frame) hidden=\(v.isHidden)\n"
+                if d < 5 { v.subviews.forEach { walk($0, d + 1) } }
+            }
+            if let c = w.standardWindowButton(.closeButton)?.superview { walk(c.superview ?? c, 0) }
+            try? out.write(toFile: "/tmp/agentic-titlebar.log", atomically: true, encoding: .utf8)
         }
         func hideControls() {
             let id = NSUserInterfaceItemIdentifier("cmux.titlebarControls")
-            for accessory in window?.titlebarAccessoryViewControllers ?? [] where accessory.view.identifier == id {
-                accessory.isHidden = true
-                accessory.view.alphaValue = 0
+            guard let window else { return }
+            // Remove outright: hiding is undone whenever cmux re-applies its chrome.
+            for (i, accessory) in window.titlebarAccessoryViewControllers.enumerated().reversed()
+            where accessory.view.identifier == id {
+                window.removeTitlebarAccessoryViewController(at: i)
             }
         }
     }
