@@ -525,18 +525,7 @@ struct AgenticTopBar: View {
                 iconButton(unread > 0 ? "bell.badge.fill" : "bell", tint: unread > 0 ? AgenticPalette.red : AgenticPalette.subtext) {
                     AppDelegate.shared?.toggleNotificationsPopover()
                 }
-                Menu {
-                    ForEach(AgenticTheme.choices, id: \.self) { name in
-                        Button((name == AgenticTheme.current ? "✓ " : "") + name) { AgenticTheme.apply(name, reload: true) }
-                    }
-                } label: {
-                    Image(systemName: "paintpalette")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundColor(AgenticPalette.subtext)
-                        .frame(width: 26, height: 24)
-                        .background(RoundedRectangle(cornerRadius: 6).fill(AgenticPalette.surface0))
-                }
-                .menuStyle(.borderlessButton).menuIndicator(.hidden).fixedSize()
+                iconButton("paintpalette", tint: AgenticPalette.subtext) { AgenticTheme.showMenu() }
                 iconButton("plus", tint: AgenticPalette.subtext) {
                     var n = 1
                     while tabManager.tabs.contains(where: { AgenticActions.numbered($0) == n }) { n += 1 }
@@ -1199,6 +1188,24 @@ enum AgenticTheme {
     }
 
     private static func ghosttyName(_ name: String) -> String { name == "Tokyo Night" ? "TokyoNight" : name }
+
+    private final class Handler: NSObject {
+        static let shared = Handler()
+        @objc func pick(_ item: NSMenuItem) {
+            Task { @MainActor in AgenticTheme.apply(item.title, reload: true) }
+        }
+    }
+
+    static func showMenu() {
+        let menu = NSMenu()
+        for name in choices {
+            let item = NSMenuItem(title: name, action: #selector(Handler.pick(_:)), keyEquivalent: "")
+            item.target = Handler.shared
+            item.state = name == current ? .on : .off
+            menu.addItem(item)
+        }
+        menu.popUp(positioning: nil, at: NSEvent.mouseLocation, in: nil)
+    }
 
     /// Writes the theme into Ghostty's config; `reload` asks the running terminals to pick it up.
     static func apply(_ name: String, reload: Bool) {
