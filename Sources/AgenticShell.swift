@@ -278,25 +278,31 @@ extension AgenticActions {
         return nums + tabs.filter { numbered($0) == nil }
     }
 
-    /// Cycle through the selected project's sub-workspaces (`alpha.1`, `alpha.2`, ...),
-    /// creating the next one when there is only one.
+    /// `]` goes to the next sub-workspace of the current one (`alpha.1` -> `alpha.2`),
+    /// creating it, empty, when there is none -- so it keeps making new ones.
+    /// `[` goes back and stops at the first.
     static func cycleSub(_ step: Int, in tabManager: TabManager) {
         guard let current = tabManager.selectedWorkspace else { return }
         let name = label(current)
         let base = name.split(separator: ".").first.map(String.init) ?? name
-        let siblings = tabManager.tabs.filter {
-            let l = label($0)
-            return l == base || l.hasPrefix(base + ".")
+        func subIndex(_ ws: Workspace) -> Int? {
+            let l = label(ws)
+            if l == base { return 1 }
+            guard l.hasPrefix(base + "."), let n = Int(l.dropFirst(base.count + 1)) else { return nil }
+            return n
         }
-        guard let idx = siblings.firstIndex(where: { $0.id == current.id }) else { return }
-        if siblings.count == 1 {
-            if step > 0 {
-                newEmptyWorkspace(title: "\(base).2", in: tabManager)
+        let siblings = tabManager.tabs.compactMap { ws in subIndex(ws).map { (index: $0, ws: ws) } }
+            .sorted { $0.index < $1.index }
+        guard let here = subIndex(current), let pos = siblings.firstIndex(where: { $0.ws.id == current.id }) else { return }
+        if step > 0 {
+            if pos + 1 < siblings.count {
+                tabManager.selectWorkspace(siblings[pos + 1].ws)
+            } else {
+                newEmptyWorkspace(title: "\(base).\(here + 1)", in: tabManager)
             }
-            return
+        } else if pos > 0 {
+            tabManager.selectWorkspace(siblings[pos - 1].ws)
         }
-        let next = (idx + step + siblings.count) % siblings.count
-        tabManager.selectWorkspace(siblings[next])
     }
 
     /// SUPER+N: the next workspace with an agent waiting on you.
