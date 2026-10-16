@@ -185,15 +185,15 @@ enum AgenticActions {
         // tiled as Hyprland's workspace-terminals.sh does: column, then a row.
         guard let ws = tabManager.addWorkspace(
             title: project.workspaceTitle,
-            initialTerminalCommand: AgenticProfile.attachCommand(project.name)
+            initialTerminalInput: AgenticProfile.attachCommand(project.name) + "\n"
         ) as Workspace?, let first = ws.focusedPanelId else { return }
         if let second = ws.newTerminalSplit(
             from: first, orientation: SplitDirection.right.orientation,
-            initialCommand: AgenticProfile.attachCommand(project.name + "1")
+            initialInput: AgenticProfile.attachCommand(project.name + "1") + "\n"
         ) {
             _ = ws.newTerminalSplit(
                 from: second.id, orientation: SplitDirection.down.orientation,
-                initialCommand: AgenticProfile.attachCommand(project.name + "2")
+                initialInput: AgenticProfile.attachCommand(project.name + "2") + "\n"
             )
         }
     }
@@ -291,7 +291,7 @@ extension AgenticActions {
         guard let idx = siblings.firstIndex(where: { $0.id == current.id }) else { return }
         if siblings.count == 1 {
             if step > 0 {
-                _ = tabManager.addWorkspace(title: "\(base).2", initialTerminalCommand: AgenticProfile.attachCommand("\(base)2"))
+                _ = tabManager.addWorkspace(title: "\(base).2", initialTerminalInput: AgenticProfile.attachCommand("\(base)2") + "\n")
             }
             return
         }
@@ -658,7 +658,7 @@ extension AgenticActions {
         if let ws = tabManager.tabs.first(where: { label($0) == title }) {
             tabManager.selectWorkspace(ws)
         } else {
-            _ = tabManager.addWorkspace(title: title, initialTerminalCommand: "ssh \(host)")
+            _ = tabManager.addWorkspace(title: title, initialTerminalInput: "ssh \(host)\n")
         }
     }
 }
