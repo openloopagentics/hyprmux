@@ -398,7 +398,10 @@ struct AgenticTopBar: View {
     private func workspaceButton(_ workspace: Workspace) -> some View {
         let active = workspace.id == tabManager.selectedTabId
         let urgent = !active && notifications.unreadCount(forTabId: workspace.id) > 0
-        let label = workspace.customTitle ?? workspace.title
+        // Named workspaces (projects, machines) show their name; the rest are numbered,
+        // as Hyprland numbers them, instead of showing the shell's title ("~").
+        let index = (tabManager.tabs.firstIndex { $0.id == workspace.id } ?? 0) + 1
+        let label = workspace.customTitle ?? String(index)
         return Button {
             AgenticActions.select(workspace, in: tabManager)
         } label: {
