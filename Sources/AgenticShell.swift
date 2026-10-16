@@ -856,17 +856,22 @@ struct AgenticWallpaperView: View {
     @AppStorage(AgenticWallpaper.key) private var path = ""
 
     var body: some View {
-        Group {
-            if let image = resolvedImage {
-                Image(nsImage: image).resizable().scaledToFill()
-            } else {
-                LinearGradient(
-                    colors: [AgenticPalette.base, Color(red: 0.19, green: 0.17, blue: 0.30), AgenticPalette.surface0],
-                    startPoint: .topLeading, endPoint: .bottomTrailing
-                )
+        // Sized by the window, never by the picture: a 4K image would otherwise
+        // stretch the layout and push the bottom bar out of view.
+        GeometryReader { proxy in
+            Group {
+                if let image = resolvedImage {
+                    Image(nsImage: image).resizable().scaledToFill()
+                } else {
+                    LinearGradient(
+                        colors: [AgenticPalette.base, Color(red: 0.19, green: 0.17, blue: 0.30), AgenticPalette.surface0],
+                        startPoint: .topLeading, endPoint: .bottomTrailing
+                    )
+                }
             }
+            .frame(width: proxy.size.width, height: proxy.size.height)
+            .clipped()
         }
-        .clipped()
         .ignoresSafeArea()
         .allowsHitTesting(false)
     }
