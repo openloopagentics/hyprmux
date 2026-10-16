@@ -498,6 +498,7 @@ struct AgenticTopBar: View {
             }
             .onAppear {
                 AgenticAgents.shared.start()
+                AgenticTheme.apply(AgenticTheme.current, reload: false)
                 AgenticActions.adoptUnnamed(in: tabManager)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) { AgenticRestore.reattach(tabManager) }
             }
@@ -524,6 +525,18 @@ struct AgenticTopBar: View {
                 iconButton(unread > 0 ? "bell.badge.fill" : "bell", tint: unread > 0 ? AgenticPalette.red : AgenticPalette.subtext) {
                     AppDelegate.shared?.toggleNotificationsPopover()
                 }
+                Menu {
+                    ForEach(AgenticTheme.choices, id: \.self) { name in
+                        Button((name == AgenticTheme.current ? "✓ " : "") + name) { AgenticTheme.apply(name, reload: true) }
+                    }
+                } label: {
+                    Image(systemName: "paintpalette")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(AgenticPalette.subtext)
+                        .frame(width: 26, height: 24)
+                        .background(RoundedRectangle(cornerRadius: 6).fill(AgenticPalette.surface0))
+                }
+                .menuStyle(.borderlessButton).menuIndicator(.hidden).fixedSize()
                 iconButton("plus", tint: AgenticPalette.subtext) {
                     var n = 1
                     while tabManager.tabs.contains(where: { AgenticActions.numbered($0) == n }) { n += 1 }
@@ -1166,5 +1179,33 @@ struct AgenticAgentIcons: View {
         }
         .buttonStyle(.plain)
         .help("\(agent.session) on \(agent.host): \(word)")
+    }
+}
+
+// MARK: - Terminal themes
+
+/// Terminal colours never follow the OS: one fixed Ghostty theme, chosen here.
+@MainActor
+enum AgenticTheme {
+    static let choices = ["Catppuccin Mocha", "Tokyo Night", "Gruvbox Dark", "Dracula", "Nord", "Rose Pine"]
+    private static let key = "agentic.terminalTheme"
+    private static var file: URL {
+        FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".config/ghostty/config")
+    }
+
+    static var current: String {
+        let saved = UserDefaults.standard.string(forKey: key) ?? ""
+        return choices.contains(saved) ? saved : choices[0]
+    }
+
+    private static func ghosttyName(_ name: String) -> String { name == "Tokyo Night" ? "TokyoNight" : name }
+
+    /// Writes the theme into Ghostty's config; `reload` asks the running terminals to pick it up.
+    static func apply(_ name: String, reload: Bool) {
+        UserDefaults.standard.set(name, forKey: key)
+        let body = "# Written by HyprMux: the terminal theme is fixed, not light/dark.\ntheme = \(ghosttyName(name))\n"
+        try? FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
+        if (try? String(contentsOf: file, encoding: .utf8)) != body { try? body.write(to: file, atomically: true, encoding: .utf8) }
+        if reload { AppDelegate.shared?.reloadConfiguration(source: "agentic.theme") }
     }
 }
