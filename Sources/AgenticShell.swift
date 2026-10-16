@@ -436,8 +436,8 @@ enum AgenticKeymap {
             return true
         }
 
-        if code == Code.space, flags == [cmd, .control] { AgenticWallpaper.showMenu(); return true }
-        if code == Code.space, flags == [cmd, .control, .option] { AgenticWallpaper.cycle(random: false); return true }
+        if code == Code.space, flags == [cmd, .control] { AgenticWallpaper.cycle(random: false); return true }
+        if code == Code.space, flags == [cmd, .control, .option] { AgenticWallpaper.cycle(random: false, step: -1); return true }
         if code == Code.space, flags == [cmd, .control, .shift] { AgenticWallpaper.cycle(random: true); return true }
 
         if flags == [cmd, .option] {
@@ -837,7 +837,7 @@ enum AgenticWallpaper {
         @objc func reset() { UserDefaults.standard.removeObject(forKey: AgenticWallpaper.key) }
     }
 
-    static func cycle(random: Bool) {
+    static func cycle(random: Bool, step: Int = 1) {
         let all = list()
         guard !all.isEmpty else { return }
         let current = UserDefaults.standard.string(forKey: key)
@@ -846,7 +846,7 @@ enum AgenticWallpaper {
             next = all.filter { $0 != current }.randomElement() ?? all[0]
         } else {
             let i = current.flatMap { all.firstIndex(of: $0) } ?? -1
-            next = all[(i + 1) % all.count]
+            next = all[((i + step) % all.count + all.count) % all.count]
         }
         UserDefaults.standard.set(next, forKey: key)
     }
