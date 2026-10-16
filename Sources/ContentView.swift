@@ -911,6 +911,7 @@ struct ContentView: View {
     }
 
     @EnvironmentObject var tabManager: TabManager
+    @ObservedObject private var agenticEmpty = AgenticEmpty.shared
     // Unread state is read imperatively by actions and passed to leaf observers.
     // ContentView itself must not observe it: one agent notification would
     // otherwise rebuild the terminal, sidebar, and window chrome together.
@@ -1824,7 +1825,7 @@ struct ContentView: View {
         return ZStack {
             ZStack {
                 ForEach(mountedWorkspaces) { tab in
-                    let isSelectedWorkspace = selectedWorkspaceId == tab.id
+                    let isSelectedWorkspace = selectedWorkspaceId == tab.id && !agenticEmpty.isEmpty(tab.id)
                     // Never retain a live source workspace as a loading cover:
                     // that makes mount ownership depend on a later frame signal.
                     WorkspaceContentView(

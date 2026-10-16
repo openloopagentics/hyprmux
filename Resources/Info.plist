@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Hypermux</string>
+	<string>HyprMux</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
@@ -90,7 +90,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Hypermux</string>
+	<string>HyprMux</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CMUX_IROH_V2_ENVIRONMENT</key>

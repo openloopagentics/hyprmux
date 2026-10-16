@@ -1,5 +1,7 @@
 import AppKit
+import UniformTypeIdentifiers
 import Combine
+import Bonsplit
 import CmuxPanes
 import SwiftUI
 
@@ -251,8 +253,13 @@ extension AgenticActions {
         if let ws = tabManager.tabs.first(where: { numbered($0) == n }) {
             tabManager.selectWorkspace(ws)
         } else {
-            _ = tabManager.addWorkspace(title: String(n))
+            newEmptyWorkspace(title: String(n), in: tabManager)
         }
+    }
+
+    static func newEmptyWorkspace(title: String?, in tabManager: TabManager) {
+        let ws = tabManager.addWorkspace(title: title)
+        AgenticEmpty.shared.mark(ws.id)
     }
 
     /// A workspace nobody has named (it carries the shell's title) becomes the lowest
@@ -307,9 +314,21 @@ extension AgenticActions {
     }
 
     static func openWebapp(_ url: String, in tabManager: TabManager) {
-        guard let ws = tabManager.selectedWorkspace, let panel = ws.focusedPanelId,
-              let u = URL(string: url) else { return }
-        _ = tabManager.newBrowserSplit(tabId: ws.id, fromPanelId: panel, orientation: .horizontal, url: u)
+        guard let ws = tabManager.selectedWorkspace, let u = URL(string: url) else { return }
+        let wasEmpty = AgenticEmpty.shared.isEmpty(ws.id)
+        AgenticEmpty.shared.fill(ws.id)
+        guard let panel = ws.focusedPanelId else { return }
+        if wasEmpty {
+            // The hidden first terminal gives way to the browser: the browser is the first window.
+            _ = tabManager.newBrowserSplit(tabId: ws.id, fromPanelId: panel, orientation: .horizontal, url: u)
+            return
+        }
+        var orientation: SplitOrientation = .horizontal
+        if let pane = ws.paneId(forPanelId: panel),
+           let g = ws.bonsplitController.layoutSnapshot().panes.first(where: { $0.paneId == pane.id.uuidString }) {
+            orientation = g.frame.width >= g.frame.height ? .horizontal : .vertical
+        }
+        _ = tabManager.newBrowserSplit(tabId: ws.id, fromPanelId: panel, orientation: orientation, url: u)
     }
 
     static func closeFocused(in tabManager: TabManager) {
@@ -413,7 +432,8 @@ enum AgenticKeymap {
             return true
         }
 
-        if code == Code.space, flags == [cmd, .control] { AgenticWallpaper.cycle(random: false); return true }
+        if code == Code.space, flags == [cmd, .control] { AgenticWallpaper.showMenu(); return true }
+        if code == Code.space, flags == [cmd, .control, .option] { AgenticWallpaper.cycle(random: false); return true }
         if code == Code.space, flags == [cmd, .control, .shift] { AgenticWallpaper.cycle(random: true); return true }
 
         if flags == [cmd, .option] {
@@ -481,7 +501,9 @@ struct AgenticTopBar: View {
                     AppDelegate.shared?.toggleNotificationsPopover()
                 }
                 iconButton("plus", tint: AgenticPalette.subtext) {
-                    _ = tabManager.addWorkspace()
+                    var n = 1
+                    while tabManager.tabs.contains(where: { AgenticActions.numbered($0) == n }) { n += 1 }
+                    AgenticActions.newEmptyWorkspace(title: String(n), in: tabManager)
                 }
                 AgenticClock()
             }
@@ -741,6 +763,10 @@ extension AgenticActions {
     /// tall, stacked otherwise -- so the first split is a column and the next
     /// one, inside the new pane, is a row.
     static func dwindleSplit(in tabManager: TabManager) {
+        if let id = tabManager.selectedTabId, AgenticEmpty.shared.isEmpty(id) {
+            AgenticEmpty.shared.fill(id)   // the first window of an empty workspace
+            return
+        }
         var direction: SplitDirection = .right
         if let ws = tabManager.selectedWorkspace,
            let panel = ws.focusedPanelId,
@@ -766,6 +792,45 @@ enum AgenticWallpaper {
         let exts: Set<String> = ["png", "jpg", "jpeg", "webp", "heic"]
         let files = (try? FileManager.default.contentsOfDirectory(at: library, includingPropertiesForKeys: nil)) ?? []
         return files.filter { exts.contains($0.pathExtension.lowercased()) }.map(\.path).sorted()
+    }
+
+    /// SUPER+CTRL+SPACE: the background menu -- the library, or any image file.
+    @MainActor static func showMenu() {
+        let menu = NSMenu()
+        let handler = MenuHandler.shared
+        for path in list() {
+            let item = NSMenuItem(title: URL(fileURLWithPath: path).deletingPathExtension().lastPathComponent,
+                                  action: #selector(MenuHandler.pick(_:)), keyEquivalent: "")
+            item.target = handler
+            item.representedObject = path
+            item.state = path == UserDefaults.standard.string(forKey: key) ? .on : .off
+            menu.addItem(item)
+        }
+        if !menu.items.isEmpty { menu.addItem(.separator()) }
+        let choose = NSMenuItem(title: "Choose Image…", action: #selector(MenuHandler.choose), keyEquivalent: "")
+        choose.target = handler
+        menu.addItem(choose)
+        let reset = NSMenuItem(title: "Default Background", action: #selector(MenuHandler.reset), keyEquivalent: "")
+        reset.target = handler
+        menu.addItem(reset)
+        let frame = NSApp.keyWindow?.frame ?? NSScreen.main?.frame ?? .zero
+        menu.popUp(positioning: nil, at: NSPoint(x: frame.midX - 90, y: frame.midY + 60), in: nil)
+    }
+
+    final class MenuHandler: NSObject {
+        static let shared = MenuHandler()
+        @objc func pick(_ sender: NSMenuItem) {
+            if let path = sender.representedObject as? String { UserDefaults.standard.set(path, forKey: AgenticWallpaper.key) }
+        }
+        @objc func choose() {
+            let panel = NSOpenPanel()
+            panel.allowedContentTypes = [.image]
+            panel.directoryURL = AgenticWallpaper.library
+            if panel.runModal() == .OK, let url = panel.url {
+                UserDefaults.standard.set(url.path, forKey: AgenticWallpaper.key)
+            }
+        }
+        @objc func reset() { UserDefaults.standard.removeObject(forKey: AgenticWallpaper.key) }
     }
 
     static func cycle(random: Bool) {
@@ -846,4 +911,18 @@ struct AgenticTitlebarHost: NSViewRepresentable {
     }
     func makeNSView(context: Context) -> DragView { DragView() }
     func updateNSView(_ view: DragView, context: Context) { view.hideControls() }
+}
+
+// MARK: - Empty workspaces
+
+/// A new numbered workspace starts empty -- just the wallpaper, as in Hyprland --
+/// and fills in when the first window is asked for (SUPER+Return, a browser, ...).
+@MainActor
+final class AgenticEmpty: ObservableObject {
+    static let shared = AgenticEmpty()
+    @Published private(set) var ids: Set<UUID> = []
+
+    func mark(_ id: UUID) { ids.insert(id) }
+    func fill(_ id: UUID?) { if let id, ids.contains(id) { ids.remove(id) } }
+    func isEmpty(_ id: UUID) -> Bool { ids.contains(id) }
 }
