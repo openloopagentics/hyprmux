@@ -164,6 +164,37 @@ extension AgenticActions {
 
     static let topBarHiddenKey = "agentic.topBarHidden"
 
+    /// Numbered workspaces are keyed by their number, not by position: workspace "3"
+    /// is "3" whatever else exists, and SUPER+3 creates it when absent.
+    static func numbered(_ ws: Workspace) -> Int? {
+        guard let title = ws.customTitle, let n = Int(title), n > 0 else { return nil }
+        return n
+    }
+
+    static func focusNumbered(_ n: Int, in tabManager: TabManager) {
+        if let ws = tabManager.tabs.first(where: { numbered($0) == n }) {
+            tabManager.selectWorkspace(ws)
+        } else {
+            _ = tabManager.addWorkspace(title: String(n))
+        }
+    }
+
+    /// A workspace nobody has named (it carries the shell's title) becomes the lowest
+    /// free number, so every workspace is either numbered or named.
+    static func adoptUnnamed(in tabManager: TabManager) {
+        for ws in tabManager.tabs where ws.customTitle == nil {
+            var n = 1
+            while tabManager.tabs.contains(where: { numbered($0) == n }) { n += 1 }
+            tabManager.setCustomTitle(tabId: ws.id, title: String(n))
+        }
+    }
+
+    /// Hyprland's order: numbered ascending, then named in creation order.
+    static func ordered(_ tabs: [Workspace]) -> [Workspace] {
+        let nums = tabs.filter { numbered($0) != nil }.sorted { numbered($0)! < numbered($1)! }
+        return nums + tabs.filter { numbered($0) == nil }
+    }
+
     /// Cycle through the selected project's sub-workspaces (`alpha.1`, `alpha.2`, ...),
     /// creating the next one when there is only one.
     static func cycleSub(_ step: Int, in tabManager: TabManager) {
@@ -264,7 +295,7 @@ enum AgenticKeymap {
 
         if flags == cmd {
             if let n = Int(key), (1...9).contains(n) {
-                if let ws = tabManager.tabs[safe: n - 1] { tabManager.selectWorkspace(ws) }
+                AgenticActions.focusNumbered(n, in: tabManager)
                 return true
             }
             switch code {
@@ -350,6 +381,8 @@ struct AgenticTopBar: View {
     var body: some View {
         Group { if !hidden { bar } }
             .onReceive(tabManager.selectedTabIdPublisher) { AgenticHistory.shared.record($0) }
+            .onAppear { AgenticActions.adoptUnnamed(in: tabManager) }
+            .onChange(of: tabManager.tabs.count) { _ in AgenticActions.adoptUnnamed(in: tabManager) }
     }
 
     private var bar: some View {
@@ -357,7 +390,7 @@ struct AgenticTopBar: View {
             // Clear the traffic lights.
             Spacer().frame(width: 78)
             HStack(spacing: 2) {
-                ForEach(tabManager.tabs, id: \.id) { workspace in
+                ForEach(AgenticActions.ordered(tabManager.tabs), id: \.id) { workspace in
                     workspaceButton(workspace)
                 }
             }
@@ -398,10 +431,7 @@ struct AgenticTopBar: View {
     private func workspaceButton(_ workspace: Workspace) -> some View {
         let active = workspace.id == tabManager.selectedTabId
         let urgent = !active && notifications.unreadCount(forTabId: workspace.id) > 0
-        // Named workspaces (projects, machines) show their name; the rest are numbered,
-        // as Hyprland numbers them, instead of showing the shell's title ("~").
-        let index = (tabManager.tabs.firstIndex { $0.id == workspace.id } ?? 0) + 1
-        let label = workspace.customTitle ?? String(index)
+        let label = AgenticActions.label(workspace)
         return Button {
             AgenticActions.select(workspace, in: tabManager)
         } label: {
