@@ -12,11 +12,8 @@ struct WorkspacePresentationModeContentTopPaddingModifier: ViewModifier {
     }
 
     func body(content: Content) -> some View {
-        content.padding(.top, ContentView.effectiveTitlebarPadding(
-            isMinimalMode: isMinimalMode,
-            isFullScreen: isFullScreen,
-            titlebarPadding: runtimeCache.titlebarPadding,
-            hostingSafeAreaTop: runtimeCache.hostingSafeAreaTop
-        ))
+        // HyprMux: the top bar owns the titlebar strip, so the terminals start right
+        // under it -- no extra titlebar-height padding above them.
+        content
     }
 }
