@@ -486,7 +486,10 @@ struct AgenticTopBar: View {
 
     var body: some View {
         Group { if !hidden { bar } }
-            .onReceive(tabManager.selectedTabIdPublisher) { AgenticHistory.shared.record($0) }
+            .onReceive(tabManager.selectedTabIdPublisher) { id in
+                AgenticHistory.shared.record(id)
+                AgenticEmpty.shared.selectionChanged(to: id, in: tabManager)
+            }
             .onAppear {
                 AgenticActions.adoptUnnamed(in: tabManager)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) { AgenticRestore.reattach(tabManager) }
@@ -946,6 +949,18 @@ final class AgenticEmpty: ObservableObject {
     func mark(_ id: UUID) { ids.insert(id) }
     func fill(_ id: UUID?) { if let id, ids.contains(id) { ids.remove(id) } }
     func isEmpty(_ id: UUID) -> Bool { ids.contains(id) }
+
+    private var lastSelected: UUID?
+
+    /// Hyprland drops an empty workspace the moment you leave it.
+    func selectionChanged(to id: UUID?, in tabManager: TabManager) {
+        let previous = lastSelected
+        lastSelected = id
+        guard let previous, previous != id, ids.contains(previous), tabManager.tabs.count > 1,
+              let workspace = tabManager.tabs.first(where: { $0.id == previous }) else { return }
+        ids.remove(previous)
+        tabManager.closeWorkspace(workspace, recordHistory: false)
+    }
 }
 
 // MARK: - Re-login after a restart
