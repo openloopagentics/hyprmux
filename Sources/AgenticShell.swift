@@ -43,63 +43,128 @@ enum AgenticPalette {
 
 /// One named project: a workspace, its chord (Cmd+Shift+<key>) and a colour.
 struct AgenticProject: Identifiable, Equatable {
-    let name: String
+    let name: String        // the workspace name (bar.toml `Badge`)
     let key: String
     let color: String
+    var text: String? = nil // the button's label (bar.toml `Text`)
+    var icon: String? = nil // icons/<icon>.svg|png beside bar.toml
     var id: String { name }
 
     /// The workspace title for sub-workspace 1, as Hyprland names it.
     var workspaceTitle: String { name + ".1" }
 }
 
-enum AgenticProfile {
-    /// Same placeholder table as agentic-laptop's examples/profile/bar.toml.
-    /// ~/.config/agentic/projects.json ([{"name","key","color"}]) replaces it.
-    static let projects: [AgenticProject] = {
-        let url = FileManager.default.homeDirectoryForCurrentUser
-            .appendingPathComponent(".config/agentic/projects.json")
-        if let data = try? Data(contentsOf: url),
-           let raw = try? JSONSerialization.jsonObject(with: data) as? [[String: String]] {
-            let loaded = raw.compactMap { row -> AgenticProject? in
-                guard let name = row["name"], let key = row["key"] else { return nil }
-                return AgenticProject(name: name, key: key.lowercased(), color: row["color"] ?? "blue")
-            }
-            if !loaded.isEmpty { return loaded }
-        }
-        return [
-            AgenticProject(name: "alpha", key: "o", color: "blue"),
-            AgenticProject(name: "beta", key: "v", color: "mauve"),
-            AgenticProject(name: "gamma", key: "d", color: "peach"),
-            AgenticProject(name: "delta", key: "s", color: "green"),
-            AgenticProject(name: "epsilon", key: "h", color: "red"),
-            AgenticProject(name: "zeta", key: "l", color: "teal"),
-            AgenticProject(name: "lambda", key: "e", color: "yellow"),
-        ]
-    }()
-}
-
 struct AgenticMachine { let name: String; let host: String; let color: String }
 
-extension AgenticProfile {
-    /// Second dock level, a workspace each like projects (bar.toml MediaLayerKeys).
-    static let customers: [AgenticProject] = [
-        AgenticProject(name: "eta", key: "c", color: "yellow"),
-        AgenticProject(name: "theta", key: "k", color: "blue"),
-        AgenticProject(name: "iota", key: "q", color: "mauve"),
-        AgenticProject(name: "kappa", key: "j", color: "green"),
-    ]
+struct AgenticCommandButton { let text: String; let icon: String?; let exec: String; let key: String }
 
-    /// Third level, from ~/.config/agentic/machines.json: [{"name","host","color"}].
-    static let machines: [AgenticMachine] = {
-        let url = FileManager.default.homeDirectoryForCurrentUser
-            .appendingPathComponent(".config/agentic/machines.json")
-        guard let data = try? Data(contentsOf: url),
-              let raw = try? JSONSerialization.jsonObject(with: data) as? [[String: String]] else { return [] }
-        return raw.compactMap { row in
-            guard let name = row["name"], let host = row["host"] else { return nil }
-            return AgenticMachine(name: name, host: host, color: row["color"] ?? "blue")
-        }
+/// The personal profile (agentic-profile): ~/.config/agentic-laptop/bar.toml, the
+/// same file the Linux dock reads. Projects, customers, machines and the
+/// tool buttons all come from it; without it the placeholder table applies.
+enum AgenticProfile {
+    static let directory = FileManager.default.homeDirectoryForCurrentUser
+        .appendingPathComponent(".config/agentic-laptop")
+
+    private struct Parsed {
+        var projects: [AgenticProject] = []
+        var customers: [AgenticProject] = []
+        var machines: [AgenticMachine] = []
+        var commands: [AgenticCommandButton] = []
+    }
+
+    private static let parsed: Parsed = {
+        guard let text = try? String(contentsOf: directory.appendingPathComponent("bar.toml"), encoding: .utf8)
+        else { return Parsed() }
+        return parse(text)
     }()
+
+    private static func field(_ name: String, in line: String) -> String? {
+        let pattern = "\\b\(name)\\s*=\\s*\"([^\"]*)\""
+        guard let r = line.range(of: pattern, options: .regularExpression) else { return nil }
+        let match = String(line[r])
+        guard let q = match.firstIndex(of: "\"") else { return nil }
+        return String(match[match.index(after: q)...].dropLast())
+    }
+
+    private static func actionKey(in line: String) -> String? {
+        guard let r = line.range(of: "Action\\s*=\\s*\\[[^\\]]*\\]", options: .regularExpression) else { return nil }
+        let items = line[r].components(separatedBy: "\"").enumerated().filter { $0.offset % 2 == 1 }.map(\.element)
+        return items.last?.lowercased()
+    }
+
+    private static func parse(_ text: String) -> Parsed {
+        var out = Parsed()
+        var section = ""
+        for raw in text.split(separator: "\n", omittingEmptySubsequences: false) {
+            let line = raw.trimmingCharacters(in: .whitespaces)
+            if line.hasPrefix("#") || line.isEmpty { continue }
+            if let eq = line.range(of: "^[A-Za-z]+\\s*=\\s*\\[\\s*$", options: .regularExpression) {
+                section = String(line[eq]).components(separatedBy: "=")[0].trimmingCharacters(in: .whitespaces)
+                continue
+            }
+            if line.hasPrefix("]") { section = ""; continue }
+            guard line.hasPrefix("{"), let label = field("Text", in: line) else { continue }
+            let color = field("Color", in: line) ?? "surface"
+            let icon = field("Icon", in: line)
+            switch section {
+            case "PrimaryLayerKeys", "MediaLayerKeys":
+                if let badge = field("Badge", in: line), let key = actionKey(in: line) {
+                    let project = AgenticProject(name: badge, key: key, color: color, text: label, icon: icon)
+                    if section == "PrimaryLayerKeys" { out.projects.append(project) } else { out.customers.append(project) }
+                } else if section == "PrimaryLayerKeys", let exec = field("Exec", in: line) {
+                    out.commands.append(AgenticCommandButton(
+                        text: label, icon: icon,
+                        exec: exec.replacingOccurrences(of: "$HOME", with: NSHomeDirectory()),
+                        key: actionKey(in: line) ?? ""
+                    ))
+                }
+            case "machines":
+                if let host = field("Host", in: line) {
+                    out.machines.append(AgenticMachine(name: field("Workspace", in: line) ?? label, host: host, color: color))
+                }
+            default: break
+            }
+        }
+        return out
+    }
+
+    static let projects: [AgenticProject] = parsed.projects.isEmpty ? [
+        AgenticProject(name: "alpha", key: "o", color: "blue"),
+        AgenticProject(name: "beta", key: "v", color: "mauve"),
+        AgenticProject(name: "gamma", key: "d", color: "peach"),
+        AgenticProject(name: "delta", key: "s", color: "green"),
+        AgenticProject(name: "epsilon", key: "h", color: "red"),
+        AgenticProject(name: "zeta", key: "l", color: "teal"),
+        AgenticProject(name: "lambda", key: "e", color: "yellow"),
+    ] : parsed.projects
+
+    static let customers: [AgenticProject] = parsed.customers
+    static let machines: [AgenticMachine] = parsed.machines
+    static let commands: [AgenticCommandButton] = parsed.commands
+
+    /// `icons/<name>.svg` or `.png` beside bar.toml.
+    static func icon(named name: String?) -> NSImage? {
+        guard let name else { return nil }
+        for ext in ["svg", "png"] {
+            let url = directory.appendingPathComponent("icons/\(name).\(ext)")
+            if let image = NSImage(contentsOf: url) { return image }
+        }
+        return nil
+    }
+
+    /// The first node in the fleet file, or $AGENTIC_REMOTE: where `r` attaches.
+    static var remoteHost: String? {
+        if let env = ProcessInfo.processInfo.environment["AGENTIC_REMOTE"], !env.isEmpty { return env }
+        let fleet = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".config/claude-badged/fleet")
+        return (try? String(contentsOf: fleet, encoding: .utf8))?
+            .split(separator: "\n").first.map(String.init)
+    }
+
+    /// `r <session>`: attach to (or create) a tmux session on the fleet's first node.
+    static func attachCommand(_ session: String) -> String {
+        guard let host = remoteHost else { return "tmux new -A -s '\(session)'" }
+        return "ssh -t \(host) \"tmux new -A -s '\(session)'\""
+    }
 }
 
 // MARK: - Actions
@@ -114,10 +179,21 @@ enum AgenticActions {
             tabManager.selectWorkspace(existing)
             return
         }
-        _ = tabManager.addWorkspace(
+        // Three terminals on the project's tmux sessions (`name`, `name1`, `name2`),
+        // tiled as Hyprland's workspace-terminals.sh does: column, then a row.
+        guard let ws = tabManager.addWorkspace(
             title: project.workspaceTitle,
-            initialTerminalCommand: "r \(project.name)-1"
-        )
+            initialTerminalCommand: AgenticProfile.attachCommand(project.name)
+        ) as Workspace?, let first = ws.focusedPanelId else { return }
+        if let second = ws.newTerminalSplit(
+            from: first, orientation: SplitDirection.right.orientation,
+            initialCommand: AgenticProfile.attachCommand(project.name + "1")
+        ) {
+            _ = ws.newTerminalSplit(
+                from: second.id, orientation: SplitDirection.down.orientation,
+                initialCommand: AgenticProfile.attachCommand(project.name + "2")
+            )
+        }
     }
 
     static func select(_ workspace: Workspace, in tabManager: TabManager) {
@@ -208,7 +284,7 @@ extension AgenticActions {
         guard let idx = siblings.firstIndex(where: { $0.id == current.id }) else { return }
         if siblings.count == 1 {
             if step > 0 {
-                _ = tabManager.addWorkspace(title: "\(base).2", initialTerminalCommand: "r \(base)-2")
+                _ = tabManager.addWorkspace(title: "\(base).2", initialTerminalCommand: AgenticProfile.attachCommand("\(base)2"))
             }
             return
         }
@@ -477,6 +553,7 @@ struct AgenticDockButton: Identifiable {
     let hint: String
     let color: String
     let kind: Kind
+    var icon: String? = nil
     var id: String { label + hint }
 }
 
@@ -496,19 +573,16 @@ final class AgenticDock: ObservableObject {
     let layers: [AgenticDockLayer] = {
         var out: [AgenticDockLayer] = []
         var primary = AgenticProfile.projects.map {
-            AgenticDockButton(label: $0.name, hint: "⇧⌘" + $0.key.uppercased(), color: $0.color, kind: .project($0))
+            AgenticDockButton(label: $0.text ?? $0.name, hint: "⇧⌘" + $0.key.uppercased(), color: $0.color, kind: .project($0), icon: $0.icon)
         }
-        let fm = FileManager.default
-        for (label, file) in [("tasks", "agentic-tasks"), ("accounts", "agentic-accounts")] {
-            let path = fm.homeDirectoryForCurrentUser.appendingPathComponent(".local/bin/\(file)").path
-            if fm.isExecutableFile(atPath: path) {
-                primary.append(AgenticDockButton(label: label, hint: "", color: "surface", kind: .command(path)))
-            }
+        // tasks / accounts: shown once their tools exist on this machine.
+        for c in AgenticProfile.commands where FileManager.default.isExecutableFile(atPath: c.exec) {
+            primary.append(AgenticDockButton(label: c.text, hint: "⇧⌘" + c.key.uppercased(), color: "surface", kind: .command(c.exec), icon: c.icon))
         }
         out.append(AgenticDockLayer(name: "projects", buttons: primary))
         if !AgenticProfile.customers.isEmpty {
             out.append(AgenticDockLayer(name: "customers", buttons: AgenticProfile.customers.map {
-                AgenticDockButton(label: $0.name, hint: "⇧⌘" + $0.key.uppercased(), color: $0.color, kind: .project($0))
+                AgenticDockButton(label: $0.text ?? $0.name, hint: "⇧⌘" + $0.key.uppercased(), color: $0.color, kind: .project($0), icon: $0.icon)
             }))
         }
         if !AgenticProfile.machines.isEmpty {
@@ -609,7 +683,7 @@ struct AgenticBottomBar: View {
         var workspace: Workspace?
         switch button.kind {
         case .project(let p): workspace = tabManager.tabs.first { AgenticActions.label($0) == p.workspaceTitle }
-        case .machine: workspace = tabManager.tabs.first { AgenticActions.label($0) == button.label + ".1" }
+        case .machine(let host): workspace = tabManager.tabs.first { AgenticActions.label($0) == AgenticProfile.machines.first { $0.host == host }.map { $0.name + ".1" } }
         default: break
         }
         let unread = workspace.map { notifications.unreadCount(forTabId: $0.id) } ?? 0
@@ -620,9 +694,16 @@ struct AgenticBottomBar: View {
         } label: {
             ZStack(alignment: .topTrailing) {
                 VStack(spacing: 0) {
-                    Text(button.label)
-                        .font(.system(size: 14, weight: .medium, design: .monospaced))
-                        .foregroundColor(button.color == "surface" ? AgenticPalette.text : tint)
+                    if let image = AgenticProfile.icon(named: button.icon) {
+                        Image(nsImage: image)
+                            .resizable().scaledToFit()
+                            .frame(height: 20)
+                            .help(button.label)
+                    } else {
+                        Text(button.label)
+                            .font(.system(size: 14, weight: .medium, design: .monospaced))
+                            .foregroundColor(button.color == "surface" ? AgenticPalette.text : tint)
+                    }
                     if !button.hint.isEmpty {
                         Text(button.hint)
                             .font(.system(size: 8, design: .monospaced))
