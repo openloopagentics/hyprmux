@@ -78,6 +78,30 @@ enum AgenticProfile {
     }()
 }
 
+struct AgenticMachine { let name: String; let host: String; let color: String }
+
+extension AgenticProfile {
+    /// Second dock level, a workspace each like projects (bar.toml MediaLayerKeys).
+    static let customers: [AgenticProject] = [
+        AgenticProject(name: "eta", key: "c", color: "yellow"),
+        AgenticProject(name: "theta", key: "k", color: "blue"),
+        AgenticProject(name: "iota", key: "q", color: "mauve"),
+        AgenticProject(name: "kappa", key: "j", color: "green"),
+    ]
+
+    /// Third level, from ~/.config/agentic/machines.json: [{"name","host","color"}].
+    static let machines: [AgenticMachine] = {
+        let url = FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent(".config/agentic/machines.json")
+        guard let data = try? Data(contentsOf: url),
+              let raw = try? JSONSerialization.jsonObject(with: data) as? [[String: String]] else { return [] }
+        return raw.compactMap { row in
+            guard let name = row["name"], let host = row["host"] else { return nil }
+            return AgenticMachine(name: name, host: host, color: row["color"] ?? "blue")
+        }
+    }()
+}
+
 // MARK: - Actions
 
 @MainActor
@@ -225,7 +249,8 @@ enum AgenticKeymap {
         let cmd: NSEvent.ModifierFlags = .command
 
         // SUPER + SHIFT + <letter>: project workspaces.
-        if flags == [cmd, .shift], let project = AgenticProfile.projects.first(where: { $0.key == key }) {
+        if flags == [cmd, .shift],
+           let project = (AgenticProfile.projects + AgenticProfile.customers).first(where: { $0.key == key }) {
             AgenticActions.open(project, in: tabManager)
             return true
         }
@@ -260,6 +285,25 @@ enum AgenticKeymap {
             case "n": AgenticActions.jumpToAttention(in: tabManager); return true
             default: break
             }
+        }
+
+        // Dock: SUPER+CTRL + arrows / Return (next level, previous level, select, go).
+        if flags == [cmd, .control] {
+            let dock = AgenticDock.shared
+            switch code {
+            case Code.down: dock.moveLayer(1); return true
+            case Code.up: dock.moveLayer(-1); return true
+            case Code.left: dock.moveSelection(-1); return true
+            case Code.right: dock.moveSelection(1); return true
+            case Code.ret: dock.activateSelected(in: tabManager); return true
+            default: break
+            }
+        }
+        // SUPER+ALT+<digit>: machines.
+        if flags == [cmd, .option], let n = Int(key), (1...9).contains(n),
+           let m = AgenticProfile.machines[safe: n - 1] {
+            AgenticActions.openMachine(m.name, host: m.host, in: tabManager)
+            return true
         }
 
         if code == Code.space, flags == [cmd, .control] { AgenticWallpaper.cycle(random: false); return true }
@@ -323,11 +367,32 @@ struct AgenticTopBar: View {
                 .foregroundColor(AgenticPalette.subtext)
                 .lineLimit(1)
             Spacer(minLength: 12)
-            AgenticClock()
-                .padding(.trailing, 10)
+            HStack(spacing: 4) {
+                iconButton(unread > 0 ? "bell.badge.fill" : "bell", tint: unread > 0 ? AgenticPalette.red : AgenticPalette.subtext) {
+                    AppDelegate.shared?.toggleNotificationsPopover()
+                }
+                iconButton("plus", tint: AgenticPalette.subtext) {
+                    _ = tabManager.addWorkspace()
+                }
+                AgenticClock()
+            }
+            .padding(.trailing, 10)
         }
         .frame(height: Self.height)
-        .background(AgenticPalette.base.opacity(0.92))
+        .background(AgenticTitlebarHost().background(AgenticPalette.base.opacity(0.92)))
+    }
+
+    private var unread: Int { notifications.unreadNotificationCount }
+
+    private func iconButton(_ symbol: String, tint: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: symbol)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundColor(tint)
+                .frame(width: 26, height: 24)
+                .background(RoundedRectangle(cornerRadius: 6).fill(AgenticPalette.surface0))
+        }
+        .buttonStyle(.plain)
     }
 
     private func workspaceButton(_ workspace: Workspace) -> some View {
@@ -366,43 +431,181 @@ struct AgenticClock: View {
     }
 }
 
-// MARK: - Bottom dock (the Touch Bar's project row)
+// MARK: - Bottom dock (the Touch Bar's layers)
+
+struct AgenticDockButton: Identifiable {
+    enum Kind {
+        case project(AgenticProject)
+        case machine(host: String)
+        case fkey(UInt16)
+        case command(String)
+    }
+    let label: String
+    let hint: String
+    let color: String
+    let kind: Kind
+    var id: String { label + hint }
+}
+
+struct AgenticDockLayer: Identifiable {
+    let name: String
+    let buttons: [AgenticDockButton]
+    var id: String { name }
+}
+
+@MainActor
+final class AgenticDock: ObservableObject {
+    static let shared = AgenticDock()
+    @Published var layerIndex = 0
+    @Published var selected = 0
+
+    /// Outermost first, as FnCycle in bar.toml: projects, customers, machines, F-keys.
+    let layers: [AgenticDockLayer] = {
+        var out: [AgenticDockLayer] = []
+        var primary = AgenticProfile.projects.map {
+            AgenticDockButton(label: $0.name, hint: "⇧⌘" + $0.key.uppercased(), color: $0.color, kind: .project($0))
+        }
+        let fm = FileManager.default
+        for (label, file) in [("tasks", "agentic-tasks"), ("accounts", "agentic-accounts")] {
+            let path = fm.homeDirectoryForCurrentUser.appendingPathComponent(".local/bin/\(file)").path
+            if fm.isExecutableFile(atPath: path) {
+                primary.append(AgenticDockButton(label: label, hint: "", color: "surface", kind: .command(path)))
+            }
+        }
+        out.append(AgenticDockLayer(name: "projects", buttons: primary))
+        if !AgenticProfile.customers.isEmpty {
+            out.append(AgenticDockLayer(name: "customers", buttons: AgenticProfile.customers.map {
+                AgenticDockButton(label: $0.name, hint: "⇧⌘" + $0.key.uppercased(), color: $0.color, kind: .project($0))
+            }))
+        }
+        if !AgenticProfile.machines.isEmpty {
+            out.append(AgenticDockLayer(name: "machines", buttons: AgenticProfile.machines.enumerated().map { i, m in
+                AgenticDockButton(label: m.name, hint: "⌥⌘\(i + 1)", color: m.color, kind: .machine(host: m.host))
+            }))
+        }
+        let codes: [UInt16] = [122, 120, 99, 118, 96, 97, 98, 100, 101, 109, 103, 111]
+        out.append(AgenticDockLayer(name: "F1-F12", buttons: codes.enumerated().map { i, c in
+            AgenticDockButton(label: "F\(i + 1)", hint: "", color: "surface", kind: .fkey(c))
+        }))
+        return out
+    }()
+
+    var current: AgenticDockLayer { layers[layerIndex] }
+
+    func moveLayer(_ delta: Int) {
+        layerIndex = min(max(layerIndex + delta, 0), layers.count - 1)
+        selected = 0
+    }
+
+    func moveSelection(_ delta: Int) {
+        let n = current.buttons.count
+        guard n > 0 else { return }
+        selected = (selected + delta + n) % n
+    }
+
+    func activate(_ button: AgenticDockButton, in tabManager: TabManager) {
+        switch button.kind {
+        case .project(let p): AgenticActions.open(p, in: tabManager)
+        case .machine(let host): AgenticActions.openMachine(button.label, host: host, in: tabManager)
+        case .command(let path): Process.launchedProcess(launchPath: path, arguments: [])
+        case .fkey(let code):
+            for down in [true, false] {
+                CGEvent(keyboardEventSource: nil, virtualKey: CGKeyCode(code), keyDown: down)?
+                    .postToPid(ProcessInfo.processInfo.processIdentifier)
+            }
+        }
+    }
+
+    func activateSelected(in tabManager: TabManager) {
+        guard current.buttons.indices.contains(selected) else { return }
+        activate(current.buttons[selected], in: tabManager)
+    }
+}
+
+extension AgenticActions {
+    /// A machine gets its own workspace, `<name>.1`, with a shell on the host.
+    static func openMachine(_ name: String, host: String, in tabManager: TabManager) {
+        let title = name + ".1"
+        if let ws = tabManager.tabs.first(where: { label($0) == title }) {
+            tabManager.selectWorkspace(ws)
+        } else {
+            _ = tabManager.addWorkspace(title: title, initialTerminalCommand: "ssh \(host)")
+        }
+    }
+}
 
 struct AgenticBottomBar: View {
     @ObservedObject var tabManager: TabManager
+    @ObservedObject private var dock = AgenticDock.shared
     @ObservedObject private var notifications = TerminalNotificationStore.shared
 
-    static let height: CGFloat = 44
+    static let height: CGFloat = 48
 
     var body: some View {
         HStack(spacing: 6) {
-            ForEach(AgenticProfile.projects) { project in
-                projectButton(project)
+            arrow("chevron.left", enabled: dock.layerIndex > 0) { dock.moveLayer(-1) }
+            ForEach(Array(dock.current.buttons.enumerated()), id: \.element.id) { index, button in
+                dockButton(button, selected: index == dock.selected)
             }
+            arrow("chevron.right", enabled: dock.layerIndex < dock.layers.count - 1) { dock.moveLayer(1) }
         }
         .padding(.horizontal, 8)
         .frame(maxWidth: .infinity)
         .frame(height: Self.height)
         .background(Color.black.opacity(0.92))
+        .overlay(alignment: .topTrailing) {
+            Text(dock.current.name)
+                .font(.system(size: 9, design: .monospaced))
+                .foregroundColor(AgenticPalette.overlay0)
+                .padding(.trailing, 10).padding(.top, 2)
+        }
     }
 
-    private func projectButton(_ project: AgenticProject) -> some View {
-        let workspace = tabManager.tabs.first { ($0.customTitle ?? $0.title) == project.workspaceTitle }
+    private func arrow(_ symbol: String, enabled: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: symbol)
+                .font(.system(size: 12, weight: .bold))
+                .foregroundColor(enabled ? AgenticPalette.subtext : AgenticPalette.surface1)
+                .frame(width: 26, height: 34)
+        }
+        .buttonStyle(.plain)
+        .disabled(!enabled)
+    }
+
+    private func dockButton(_ button: AgenticDockButton, selected: Bool) -> some View {
+        var workspace: Workspace?
+        switch button.kind {
+        case .project(let p): workspace = tabManager.tabs.first { AgenticActions.label($0) == p.workspaceTitle }
+        case .machine: workspace = tabManager.tabs.first { AgenticActions.label($0) == button.label + ".1" }
+        default: break
+        }
         let unread = workspace.map { notifications.unreadCount(forTabId: $0.id) } ?? 0
-        let tint = AgenticPalette.named(project.color)
+        let isCurrent = workspace?.id == tabManager.selectedTabId
+        let tint = AgenticPalette.named(button.color)
         return Button {
-            AgenticActions.open(project, in: tabManager)
+            dock.activate(button, in: tabManager)
         } label: {
             ZStack(alignment: .topTrailing) {
-                Text(project.name)
-                    .font(.system(size: 14, weight: .medium, design: .monospaced))
-                    .foregroundColor(tint)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 32)
-                    .background(
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(workspace?.id == tabManager.selectedTabId ? AgenticPalette.surface1 : AgenticPalette.surface0.opacity(0.6))
-                    )
+                VStack(spacing: 0) {
+                    Text(button.label)
+                        .font(.system(size: 14, weight: .medium, design: .monospaced))
+                        .foregroundColor(button.color == "surface" ? AgenticPalette.text : tint)
+                    if !button.hint.isEmpty {
+                        Text(button.hint)
+                            .font(.system(size: 8, design: .monospaced))
+                            .foregroundColor(AgenticPalette.overlay0)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: 38)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(isCurrent ? AgenticPalette.surface1 : AgenticPalette.surface0.opacity(0.6))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(selected ? tint : Color.clear, lineWidth: 1.5)
+                )
                 if unread > 0 {
                     Text("\(unread)")
                         .font(.system(size: 10, weight: .bold))
@@ -414,13 +617,6 @@ struct AgenticBottomBar: View {
             }
         }
         .buttonStyle(.plain)
-    }
-}
-
-extension String {
-    func appendLine(to path: String) throws {
-        let h = try FileHandle(forWritingTo: URL(fileURLWithPath: path))
-        h.seekToEndOfFile(); h.write(data(using: .utf8)!); h.closeFile()
     }
 }
 
@@ -497,4 +693,28 @@ struct AgenticWallpaperView: View {
         if let first = AgenticWallpaper.list().first { return NSImage(contentsOfFile: first) }
         return nil
     }
+}
+
+// MARK: - Titlebar host
+
+/// Backs the top bar: drags the window, and keeps cmux's own titlebar icons
+/// (they now live in the bar's right corner) from drawing over the pills.
+struct AgenticTitlebarHost: NSViewRepresentable {
+    final class DragView: NSView {
+        override var mouseDownCanMoveWindow: Bool { true }
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            hideControls()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in self?.hideControls() }
+        }
+        func hideControls() {
+            let id = NSUserInterfaceItemIdentifier("cmux.titlebarControls")
+            for accessory in window?.titlebarAccessoryViewControllers ?? [] where accessory.view.identifier == id {
+                accessory.isHidden = true
+                accessory.view.alphaValue = 0
+            }
+        }
+    }
+    func makeNSView(context: Context) -> DragView { DragView() }
+    func updateNSView(_ view: DragView, context: Context) { view.hideControls() }
 }

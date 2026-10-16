@@ -2617,10 +2617,6 @@ struct ContentView: View {
                     AgenticBottomBar(tabManager: tabManager)
                 }
 
-                WorkspaceTitlebarModeLayer {
-                    workspaceTitlebarBand(appearance: appearance)
-                        .zIndex(100)
-                }
             }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                 .frame(minWidth: CGFloat(SessionPersistencePolicy.minimumWindowWidth), minHeight: CGFloat(SessionPersistencePolicy.minimumWindowHeight))
