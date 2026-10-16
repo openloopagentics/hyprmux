@@ -481,7 +481,10 @@ struct AgenticTopBar: View {
     var body: some View {
         Group { if !hidden { bar } }
             .onReceive(tabManager.selectedTabIdPublisher) { AgenticHistory.shared.record($0) }
-            .onAppear { AgenticActions.adoptUnnamed(in: tabManager) }
+            .onAppear {
+                AgenticActions.adoptUnnamed(in: tabManager)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) { AgenticRestore.reattach(tabManager) }
+            }
             .onChange(of: tabManager.tabs.count) { _ in AgenticActions.adoptUnnamed(in: tabManager) }
     }
 
@@ -937,4 +940,40 @@ final class AgenticEmpty: ObservableObject {
     func mark(_ id: UUID) { ids.insert(id) }
     func fill(_ id: UUID?) { if let id, ids.contains(id) { ids.remove(id) } }
     func isEmpty(_ id: UUID) -> Bool { ids.contains(id) }
+}
+
+// MARK: - Re-login after a restart
+
+/// cmux restores last session's workspaces with fresh local shells -- the ssh
+/// sessions died with the old app. Once per launch, put each restored project
+/// and machine terminal back on its remote: `name`, `name1`, `name2` in pane order.
+@MainActor
+enum AgenticRestore {
+    private static var done: Set<ObjectIdentifier> = []
+
+    static func reattach(_ tabManager: TabManager) {
+        guard done.insert(ObjectIdentifier(tabManager)).inserted else { return }
+        let projects = AgenticProfile.projects + AgenticProfile.customers
+        for ws in tabManager.tabs {
+            let label = AgenticActions.label(ws)
+            guard label.hasSuffix(".1") else { continue }
+            let name = String(label.dropLast(2))
+            var commands: [(Int) -> String] = []
+            if projects.contains(where: { $0.name == name }) {
+                commands.append { AgenticProfile.attachCommand($0 == 0 ? name : name + String($0)) }
+            } else if let machine = AgenticProfile.machines.first(where: { $0.name == name }) {
+                commands.append { _ in "ssh \(machine.host)" }
+            }
+            guard let command = commands.first else { continue }
+            var index = 0
+            for pane in ws.bonsplitController.allPaneIds {
+                for (id, panel) in ws.panels {
+                    guard let terminal = panel as? TerminalPanel,
+                          ws.paneId(forPanelId: id)?.id == pane.id else { continue }
+                    ws.sendInputWhenReady(command(index) + "\n", to: terminal)
+                    index += 1
+                }
+            }
+        }
+    }
 }
