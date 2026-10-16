@@ -291,7 +291,7 @@ extension AgenticActions {
         guard let idx = siblings.firstIndex(where: { $0.id == current.id }) else { return }
         if siblings.count == 1 {
             if step > 0 {
-                _ = tabManager.addWorkspace(title: "\(base).2", initialTerminalInput: AgenticProfile.attachCommand("\(base)2") + "\n")
+                newEmptyWorkspace(title: "\(base).2", in: tabManager)
             }
             return
         }
