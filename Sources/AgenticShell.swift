@@ -162,6 +162,12 @@ enum AgenticProfile {
             .split(separator: "\n").first.map(String.init)
     }
 
+    /// Every host in the fleet file.
+    static var fleet: [String] {
+        let url = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".config/claude-badged/fleet")
+        return (try? String(contentsOf: url, encoding: .utf8))?.split(whereSeparator: \.isWhitespace).map(String.init) ?? []
+    }
+
     /// `r <session>`: attach to (or create) a tmux session on the fleet's first node.
     static func attachCommand(_ session: String) -> String {
         guard let host = remoteHost else { return "tmux new -A -s '\(session)'" }
@@ -491,6 +497,7 @@ struct AgenticTopBar: View {
                 AgenticEmpty.shared.selectionChanged(to: id, in: tabManager)
             }
             .onAppear {
+                AgenticAgents.shared.start()
                 AgenticActions.adoptUnnamed(in: tabManager)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) { AgenticRestore.reattach(tabManager) }
             }
@@ -512,6 +519,7 @@ struct AgenticTopBar: View {
                 .foregroundColor(AgenticPalette.subtext)
                 .lineLimit(1)
             Spacer(minLength: 12)
+            AgenticAgentIcons(tabManager: tabManager).padding(.trailing, 8)
             HStack(spacing: 4) {
                 iconButton(unread > 0 ? "bell.badge.fill" : "bell", tint: unread > 0 ? AgenticPalette.red : AgenticPalette.subtext) {
                     AppDelegate.shared?.toggleNotificationsPopover()
@@ -996,5 +1004,167 @@ enum AgenticRestore {
                 }
             }
         }
+    }
+}
+
+// MARK: - Agent status (the top bar's agent icons)
+
+/// claude-badged, natively: agents' hooks append "<session> ask|busy|done" to
+/// ~/.claude-badges.log on whichever machine they run on. This follows that log
+/// here and on every fleet host, and keeps one entry per agent, in the order it
+/// first started working, until you click it after it has finished.
+@MainActor
+final class AgenticAgents: ObservableObject {
+    static let shared = AgenticAgents()
+
+    enum State { case working, asking, done }
+
+    struct Agent: Identifiable, Equatable {
+        let key: String          // host/session
+        let session: String
+        let host: String
+        var state: State
+        var at: Date
+        var id: String { key }
+        /// alpha, alpha1, alpha2 and alpha.1 all belong to workspace "alpha".
+        var workspace: String {
+            let base = session.split(separator: ".").first.map(String.init) ?? session
+            let trimmed = String(base.reversed().drop(while: { $0.isNumber }).reversed())
+            return trimmed.isEmpty ? base : trimmed
+        }
+    }
+
+    @Published private(set) var agents: [Agent] = []
+    private var started = false
+    private var order: [String] = []
+    private static let busyExpiry: TimeInterval = 30 * 60
+
+    func start() {
+        guard !started else { return }
+        started = true
+        follow(host: nil)
+        for host in AgenticProfile.fleet { follow(host: host) }
+        Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
+            Task { @MainActor in self?.expire() }
+        }
+    }
+
+    private func follow(host: String?) {
+        DispatchQueue.global(qos: .utility).async { [weak self] in
+            while self != nil {
+                let process = Process()
+                let pipe = Pipe()
+                if let host {
+                    process.executableURL = URL(fileURLWithPath: "/usr/bin/ssh")
+                    process.arguments = ["-o", "BatchMode=yes", "-o", "ServerAliveInterval=30", host,
+                                         "exec tail -n 0 -F ~/.claude-badges.log"]
+                } else {
+                    process.executableURL = URL(fileURLWithPath: "/usr/bin/tail")
+                    process.arguments = ["-n", "0", "-F", NSHomeDirectory() + "/.claude-badges.log"]
+                }
+                process.standardOutput = pipe
+                process.standardError = FileHandle.nullDevice
+                var pending = Data()
+                pipe.fileHandleForReading.readabilityHandler = { handle in
+                    let data = handle.availableData
+                    guard !data.isEmpty else { return }
+                    pending.append(data)
+                    while let newline = pending.firstIndex(of: 0x0A) {
+                        let line = String(decoding: pending[pending.startIndex..<newline], as: UTF8.self)
+                        pending.removeSubrange(pending.startIndex...newline)
+                        let parts = line.split(separator: " ")
+                        guard parts.count == 2 else { continue }
+                        let session = String(parts[0]), word = String(parts[1])
+                        let name = host.map { $0.split(separator: "@").last.map(String.init) ?? $0 } ?? "local"
+                        Task { @MainActor in self?.event(session: session, word: word, host: name) }
+                    }
+                }
+                do { try process.run(); process.waitUntilExit() } catch {}
+                pipe.fileHandleForReading.readabilityHandler = nil
+                Thread.sleep(forTimeInterval: 5)
+            }
+        }
+    }
+
+    private func event(session: String, word: String, host: String) {
+        let state: State
+        switch word {
+        case "busy": state = .working
+        case "ask": state = .asking
+        case "done": state = .done
+        default: return
+        }
+        let key = "\(host)/\(session)"
+        if let i = agents.firstIndex(where: { $0.key == key }) {
+            agents[i].state = state
+            agents[i].at = Date()
+        } else if state == .working {
+            agents.append(Agent(key: key, session: session, host: host, state: state, at: Date()))
+        }
+        // An agent that finishes or asks without us having seen it start still earns an icon.
+        else {
+            agents.append(Agent(key: key, session: session, host: host, state: state, at: Date()))
+        }
+    }
+
+    private func expire() {
+        let cutoff = Date().addingTimeInterval(-Self.busyExpiry)
+        agents.removeAll { $0.state == .working && $0.at < cutoff }
+    }
+
+    /// A click focuses the agent's workspace and takes a finished agent off the bar.
+    func open(_ agent: Agent, in tabManager: TabManager) {
+        let target = tabManager.tabs.first { AgenticActions.label($0) == agent.workspace + ".1" }
+            ?? tabManager.tabs.first { AgenticActions.label($0) == agent.workspace }
+            ?? tabManager.tabs.first { AgenticActions.label($0).hasPrefix(agent.workspace + ".") }
+        if let target { AgenticActions.select(target, in: tabManager) }
+        if agent.state != .working { agents.removeAll { $0.key == agent.key } }
+    }
+}
+
+struct AgenticAgentIcons: View {
+    @ObservedObject var tabManager: TabManager
+    @ObservedObject private var agents = AgenticAgents.shared
+
+    var body: some View {
+        HStack(spacing: 6) {
+            ForEach(agents.agents.prefix(8)) { agent in
+                icon(agent)
+            }
+        }
+    }
+
+    private func project(_ agent: AgenticAgents.Agent) -> AgenticProject? {
+        (AgenticProfile.projects + AgenticProfile.customers).first { $0.name == agent.workspace }
+    }
+
+    private func icon(_ agent: AgenticAgents.Agent) -> some View {
+        let p = project(agent)
+        let tint = AgenticPalette.named(p?.color ?? "blue")
+        let word = agent.state == .working ? "working" : (agent.state == .asking ? "needs you" : "done")
+        return Button { agents.open(agent, in: tabManager) } label: {
+            ZStack(alignment: .bottomTrailing) {
+                if let image = AgenticProfile.icon(named: p?.icon) {
+                    Image(nsImage: image).resizable().scaledToFit().frame(width: 18, height: 18)
+                } else {
+                    Text(String(agent.workspace.prefix(1)).uppercased())
+                        .font(.system(size: 11, weight: .bold, design: .monospaced))
+                        .foregroundColor(AgenticPalette.base)
+                        .frame(width: 18, height: 18)
+                        .background(Circle().fill(tint))
+                }
+                switch agent.state {
+                case .working:
+                    ProgressView().controlSize(.mini).scaleEffect(0.6).frame(width: 9, height: 9).offset(x: 4, y: 4)
+                case .asking:
+                    Circle().fill(AgenticPalette.red).frame(width: 8, height: 8).offset(x: 3, y: 3)
+                case .done:
+                    Circle().fill(AgenticPalette.green).frame(width: 8, height: 8).offset(x: 3, y: 3)
+                }
+            }
+            .frame(width: 24, height: 24)
+        }
+        .buttonStyle(.plain)
+        .help("\(agent.session) on \(agent.host): \(word)")
     }
 }
