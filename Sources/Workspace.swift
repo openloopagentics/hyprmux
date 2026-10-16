@@ -4081,6 +4081,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
             // Agentic shell: panes are plain terminals, no per-pane tab strip.
             tabBarHeight: 1,
             tabTitleFontSize: tabTitleFontSize,
+            dividerThickness: 6,
             dividerHitExpansion: PortalSplitDividerRegion.dividerHitExpansion,
             showSplitButtons: false,
             splitButtonBackdropEffect: Self.bonsplitSplitButtonBackdropEffect(),

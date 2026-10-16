@@ -247,10 +247,7 @@ enum AgenticKeymap {
             case Code.right: tabManager.movePaneFocus(direction: .right); return true
             case Code.up: tabManager.movePaneFocus(direction: .up); return true
             case Code.down: tabManager.movePaneFocus(direction: .down); return true
-            case Code.ret:
-                let outcome = tabManager.createSplitOutcome(direction: .right)
-                try? "split outcome=\(outcome) sel=\(String(describing: tabManager.selectedWorkspace?.focusedPanelId)) tabs=\(tabManager.tabs.count)\n".appendLine(to: "/tmp/agentic-keys.log")
-                return true
+            case Code.ret: AgenticActions.dwindleSplit(in: tabManager); return true
             case Code.minus: AgenticActions.resize(.left, in: tabManager); return true
             case Code.equal: AgenticActions.resize(.right, in: tabManager); return true
             case Code.lbracket: AgenticActions.cycleSub(-1, in: tabManager); return true
@@ -264,6 +261,9 @@ enum AgenticKeymap {
             default: break
             }
         }
+
+        if code == Code.space, flags == [cmd, .control] { AgenticWallpaper.cycle(random: false); return true }
+        if code == Code.space, flags == [cmd, .control, .shift] { AgenticWallpaper.cycle(random: true); return true }
 
         if flags == [cmd, .option] {
             switch code {
@@ -421,5 +421,80 @@ extension String {
     func appendLine(to path: String) throws {
         let h = try FileHandle(forWritingTo: URL(fileURLWithPath: path))
         h.seekToEndOfFile(); h.write(data(using: .utf8)!); h.closeFile()
+    }
+}
+
+// MARK: - Dwindle splits (Hyprland's default layout)
+
+extension AgenticActions {
+    /// A new terminal splits the focused one: side by side when it is wider than
+    /// tall, stacked otherwise -- so the first split is a column and the next
+    /// one, inside the new pane, is a row.
+    static func dwindleSplit(in tabManager: TabManager) {
+        var direction: SplitDirection = .right
+        if let ws = tabManager.selectedWorkspace,
+           let panel = ws.focusedPanelId,
+           let pane = ws.paneId(forPanelId: panel),
+           let geometry = ws.bonsplitController.layoutSnapshot().panes
+               .first(where: { $0.paneId == pane.id.uuidString }) {
+            direction = geometry.frame.width >= geometry.frame.height ? .right : .down
+        }
+        _ = tabManager.createSplitOutcome(direction: direction)
+    }
+}
+
+// MARK: - Wallpaper (hyprpaper)
+
+/// Library: ~/Pictures/wallpapers, as agentic-laptop's wallpaper.sh. With none,
+/// a Catppuccin gradient stands in.
+enum AgenticWallpaper {
+    static let key = "agentic.wallpaperPath"
+    static let library = FileManager.default.homeDirectoryForCurrentUser
+        .appendingPathComponent("Pictures/wallpapers")
+
+    static func list() -> [String] {
+        let exts: Set<String> = ["png", "jpg", "jpeg", "webp", "heic"]
+        let files = (try? FileManager.default.contentsOfDirectory(at: library, includingPropertiesForKeys: nil)) ?? []
+        return files.filter { exts.contains($0.pathExtension.lowercased()) }.map(\.path).sorted()
+    }
+
+    static func cycle(random: Bool) {
+        let all = list()
+        guard !all.isEmpty else { return }
+        let current = UserDefaults.standard.string(forKey: key)
+        let next: String
+        if random {
+            next = all.filter { $0 != current }.randomElement() ?? all[0]
+        } else {
+            let i = current.flatMap { all.firstIndex(of: $0) } ?? -1
+            next = all[(i + 1) % all.count]
+        }
+        UserDefaults.standard.set(next, forKey: key)
+    }
+}
+
+struct AgenticWallpaperView: View {
+    @AppStorage(AgenticWallpaper.key) private var path = ""
+
+    var body: some View {
+        Group {
+            if let image = resolvedImage {
+                Image(nsImage: image).resizable().scaledToFill()
+            } else {
+                LinearGradient(
+                    colors: [AgenticPalette.base, Color(red: 0.19, green: 0.17, blue: 0.30), AgenticPalette.surface0],
+                    startPoint: .topLeading, endPoint: .bottomTrailing
+                )
+            }
+        }
+        .clipped()
+        .ignoresSafeArea()
+        .allowsHitTesting(false)
+    }
+
+    private var resolvedImage: NSImage? {
+        if !path.isEmpty, let img = NSImage(contentsOfFile: path) { return img }
+        if let first = AgenticWallpaper.list().first { return NSImage(contentsOfFile: first) }
+        return nil
     }
 }

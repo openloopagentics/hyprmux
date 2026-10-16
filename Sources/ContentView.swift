@@ -2607,9 +2607,12 @@ struct ContentView: View {
                     .ignoresSafeArea()
                     .allowsHitTesting(false)
 
+                AgenticWallpaperView()
+
                 VStack(spacing: 0) {
                     AgenticTopBar(tabManager: tabManager)
                     contentAndSidebarLayout(appearance: appearance)
+                        .padding(6)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                     AgenticBottomBar(tabManager: tabManager)
                 }
