@@ -149,6 +149,7 @@
 		A76110020000000000000001 /* AgentHookNotificationPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A76110020000000000000002 /* AgentHookNotificationPolicyTests.swift */; };
 		751AA9D65BBB1979C7957BAE /* AgentHookTestNotificationPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A0C49412A8AEDDDFA20067B /* AgentHookTestNotificationPipeline.swift */; };
 		C11757000000000000000040 /* AgentHookTestNotificationPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A0C49412A8AEDDDFA20067B /* AgentHookTestNotificationPipeline.swift */; };
+		A9E02000000000000000AA01 /* AgenticShell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9E01000000000000000AA01 /* AgenticShell.swift */; };
 		D3C184780000000000000003 /* AgentInboxPollIteration.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3C184780000000000000005 /* AgentInboxPollIteration.swift */; };
 		D3C184780000000000000004 /* AgentInboxPollIteration.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3C184780000000000000005 /* AgentInboxPollIteration.swift */; };
 		273504E8019851399CF76909 /* AgentInboxProjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C5AC198D412FCD62A039CB9 /* AgentInboxProjection.swift */; };
@@ -4890,6 +4891,7 @@
 		A76110010000000000000002 /* AgentHookNotificationPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentHookNotificationPolicy.swift; sourceTree = "<group>"; };
 		A76110020000000000000002 /* AgentHookNotificationPolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentHookNotificationPolicyTests.swift; sourceTree = "<group>"; };
 		2A0C49412A8AEDDDFA20067B /* AgentHookTestNotificationPipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AgentHookTestNotificationPipeline.swift"; sourceTree = "<group>"; };
+		A9E01000000000000000AA01 /* AgenticShell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgenticShell.swift; sourceTree = "<group>"; };
 		D3C184780000000000000005 /* AgentInboxPollIteration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentInboxPollIteration.swift; sourceTree = "<group>"; };
 		7C5AC198D412FCD62A039CB9 /* AgentInboxProjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentInbox/AgentInboxProjection.swift; sourceTree = "<group>"; };
 		05D60F9593550244973C09F2 /* AgentInboxProjectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AgentInboxProjectionTests.swift"; sourceTree = "<group>"; };
@@ -11634,6 +11636,7 @@
 				A9F100000000000000000018 /* OpenCodeEventTextAccumulator.swift */,
 				A9F100000000000000000019 /* OpenCodeProcessOutputDisposition.swift */,
 				A9E01000000000000000000F /* AgentSessionRendererKind.swift */,
+				A9E01000000000000000AA01 /* AgenticShell.swift */,
 				A9E010000000000000000002 /* AgentSessionPanel.swift */,
 				A9E010000000000000000008 /* AgentSessionBridge.swift */,
 				B11371000000000000000022 /* AgentSessionOwnedProcessLauncher.swift */,
@@ -14837,6 +14840,7 @@
 				A61E00010000000000000001 /* AgentHookDeliveryEvent.swift in Sources */,
 				A61E00010000000000000005 /* AgentHookDeliveryProcess.swift in Sources */,
 				A61E00010000000000000002 /* AgentHookDeliveryQueue.swift in Sources */,
+				A9E02000000000000000AA01 /* AgenticShell.swift in Sources */,
 				273504E8019851399CF76909 /* AgentInboxProjection.swift in Sources */,
 				21E7B6BF4003059DB828137A /* AgentInboxView.swift in Sources */,
 				A77A0010A1B2C3D4E5F60001 /* AgentJournalLazyStore.swift in Sources */,

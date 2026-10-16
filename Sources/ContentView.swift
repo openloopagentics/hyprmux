@@ -2607,7 +2607,12 @@ struct ContentView: View {
                     .ignoresSafeArea()
                     .allowsHitTesting(false)
 
-                contentAndSidebarLayout(appearance: appearance)
+                VStack(spacing: 0) {
+                    AgenticTopBar(tabManager: tabManager)
+                    contentAndSidebarLayout(appearance: appearance)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    AgenticBottomBar(tabManager: tabManager)
+                }
 
                 WorkspaceTitlebarModeLayer {
                     workspaceTitlebarBand(appearance: appearance)
