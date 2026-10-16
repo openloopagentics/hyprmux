@@ -873,7 +873,10 @@ struct AgenticWallpaperView: View {
 
     private var resolvedImage: NSImage? {
         if !path.isEmpty, let img = NSImage(contentsOfFile: path) { return img }
-        if let first = AgenticWallpaper.list().first { return NSImage(contentsOfFile: first) }
+        // Default: the Linux setup's first background (lupine-02), else the first in the library.
+        let all = AgenticWallpaper.list()
+        let fallback = all.first { URL(fileURLWithPath: $0).lastPathComponent.hasPrefix("lupine-02") } ?? all.first
+        if let fallback { return NSImage(contentsOfFile: fallback) }
         return nil
     }
 }
