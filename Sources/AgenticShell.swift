@@ -319,8 +319,12 @@ extension AgenticActions {
         AgenticEmpty.shared.fill(ws.id)
         guard let panel = ws.focusedPanelId else { return }
         if wasEmpty {
-            // The hidden first terminal gives way to the browser: the browser is the first window.
-            _ = tabManager.newBrowserSplit(tabId: ws.id, fromPanelId: panel, orientation: .horizontal, url: u)
+            // The browser is this workspace's first window: it takes the place of the
+            // hidden first terminal, which goes away.
+            if let pane = ws.paneId(forPanelId: panel),
+               ws.newBrowserSurface(inPane: pane, url: u, focus: true) != nil {
+                _ = ws.closePanel(panel, force: true)
+            }
             return
         }
         var orientation: SplitOrientation = .horizontal
