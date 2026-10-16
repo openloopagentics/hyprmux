@@ -2638,6 +2638,7 @@ struct ContentView: View {
                     restoreMainPanelFocusAfterAppKitSidebarHiddenIfNeeded()
                 }
             }
+            sidebarState.setVisible(false)
             selectedWorkspaceDirectoryObserver.wire(tabManager: tabManager)
             tabManager.applyWindowBackgroundForSelectedTab()
             reconcileMountedWorkspaceIds()

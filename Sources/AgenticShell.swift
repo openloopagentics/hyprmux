@@ -1,5 +1,6 @@
 import AppKit
 import Combine
+import CmuxPanes
 import SwiftUI
 
 // Agentic shell: the Hyprland + waybar + Touch Bar dock experience from
@@ -100,21 +101,183 @@ enum AgenticActions {
     }
 }
 
+// MARK: - Workspace history (SUPER+ALT+Left/Right)
+
+@MainActor
+final class AgenticHistory {
+    static let shared = AgenticHistory()
+    private var visited: [UUID] = []
+    private var cursor = -1
+    private var navigating = false
+
+    func record(_ id: UUID?) {
+        guard let id, !navigating, visited[safe: cursor] != id else { return }
+        visited = Array(visited.prefix(cursor + 1)) + [id]
+        cursor = visited.count - 1
+    }
+
+    func step(_ delta: Int, in tabManager: TabManager) {
+        visited.removeAll { id in !tabManager.tabs.contains { $0.id == id } }
+        cursor = min(cursor, visited.count - 1)
+        let target = cursor + delta
+        guard visited.indices.contains(target),
+              let ws = tabManager.tabs.first(where: { $0.id == visited[target] }) else { return }
+        navigating = true
+        cursor = target
+        tabManager.selectWorkspace(ws)
+        navigating = false
+    }
+}
+
+private extension Array {
+    subscript(safe i: Int) -> Element? { indices.contains(i) ? self[i] : nil }
+}
+
+// MARK: - Actions (continued)
+
+extension AgenticActions {
+    static func label(_ ws: Workspace) -> String { ws.customTitle ?? ws.title }
+
+    static let topBarHiddenKey = "agentic.topBarHidden"
+
+    /// Cycle through the selected project's sub-workspaces (`alpha.1`, `alpha.2`, ...),
+    /// creating the next one when there is only one.
+    static func cycleSub(_ step: Int, in tabManager: TabManager) {
+        guard let current = tabManager.selectedWorkspace else { return }
+        let name = label(current)
+        let base = name.split(separator: ".").first.map(String.init) ?? name
+        let siblings = tabManager.tabs.filter {
+            let l = label($0)
+            return l == base || l.hasPrefix(base + ".")
+        }
+        guard let idx = siblings.firstIndex(where: { $0.id == current.id }) else { return }
+        if siblings.count == 1 {
+            if step > 0 {
+                _ = tabManager.addWorkspace(title: "\(base).2", initialTerminalCommand: "r \(base)-2")
+            }
+            return
+        }
+        let next = (idx + step + siblings.count) % siblings.count
+        tabManager.selectWorkspace(siblings[next])
+    }
+
+    /// SUPER+N: the next workspace with an agent waiting on you.
+    static func jumpToAttention(in tabManager: TabManager) {
+        let store = TerminalNotificationStore.shared
+        let tabs = tabManager.tabs
+        let start = tabs.firstIndex { $0.id == tabManager.selectedTabId } ?? -1
+        for offset in 1...max(tabs.count, 1) {
+            let ws = tabs[(start + offset) % tabs.count]
+            if ws.id != tabManager.selectedTabId, store.unreadCount(forTabId: ws.id) > 0 {
+                tabManager.selectWorkspace(ws)
+                return
+            }
+        }
+    }
+
+    static func openWebapp(_ url: String, in tabManager: TabManager) {
+        guard let ws = tabManager.selectedWorkspace, let panel = ws.focusedPanelId,
+              let u = URL(string: url) else { return }
+        _ = tabManager.newBrowserSplit(tabId: ws.id, fromPanelId: panel, orientation: .horizontal, url: u)
+    }
+
+    static func closeFocused(in tabManager: TabManager) {
+        guard let ws = tabManager.selectedWorkspace else { return }
+        if let panel = ws.focusedPanelId {
+            tabManager.closePanelWithConfirmation(tabId: ws.id, surfaceId: panel)
+        } else {
+            _ = tabManager.closeWorkspaceWithConfirmation(ws)
+        }
+    }
+
+    static func resize(_ dir: ResizeDirection, in tabManager: TabManager) {
+        guard let ws = tabManager.selectedWorkspace, let panel = ws.focusedPanelId else { return }
+        _ = tabManager.resizeSplit(tabId: ws.id, surfaceId: panel, direction: dir, amount: 100)
+    }
+}
+
 // MARK: - Keymap
 
-/// Hyprland-style chords. Super is Cmd. Returns true when the event is consumed.
+/// Hyprland's binds, with Super as Cmd. Returns true when the event is consumed.
+/// Where a bind collides with a cmux or macOS shortcut, Hyprland wins.
 @MainActor
 enum AgenticKeymap {
+    private enum Code {
+        static let tab: UInt16 = 48, ret: UInt16 = 36, space: UInt16 = 49
+        static let left: UInt16 = 123, right: UInt16 = 124, down: UInt16 = 125, up: UInt16 = 126
+        static let minus: UInt16 = 27, equal: UInt16 = 24, lbracket: UInt16 = 33, rbracket: UInt16 = 30
+    }
+
     static func handle(event: NSEvent, tabManager: TabManager?) -> Bool {
         guard let tabManager else { return false }
         let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
             .subtracting([.numericPad, .function, .capsLock])
-        // SUPER + SHIFT + <letter>: the project workspaces.
-        if flags == [.command, .shift],
-           let key = event.charactersIgnoringModifiers?.lowercased(),
-           let project = AgenticProfile.projects.first(where: { $0.key == key }) {
+        let code = event.keyCode
+        let key = event.charactersIgnoringModifiers?.lowercased() ?? ""
+        let cmd: NSEvent.ModifierFlags = .command
+
+        // SUPER + SHIFT + <letter>: project workspaces.
+        if flags == [cmd, .shift], let project = AgenticProfile.projects.first(where: { $0.key == key }) {
             AgenticActions.open(project, in: tabManager)
             return true
+        }
+
+        // Ctrl+Tab / Ctrl+Shift+Tab: next / previous workspace (SUPER+Tab is the OS app switcher).
+        if code == Code.tab, flags == .control { tabManager.selectNextTab(); return true }
+        if code == Code.tab, flags == [.control, .shift] { tabManager.selectPreviousTab(); return true }
+        if code == Code.tab, flags == [cmd, .control] {
+            AgenticHistory.shared.step(-1, in: tabManager); return true
+        }
+
+        if flags == cmd {
+            if let n = Int(key), (1...9).contains(n) {
+                if let ws = tabManager.tabs[safe: n - 1] { tabManager.selectWorkspace(ws) }
+                return true
+            }
+            switch code {
+            case Code.left: tabManager.movePaneFocus(direction: .left); return true
+            case Code.right: tabManager.movePaneFocus(direction: .right); return true
+            case Code.up: tabManager.movePaneFocus(direction: .up); return true
+            case Code.down: tabManager.movePaneFocus(direction: .down); return true
+            case Code.ret: _ = tabManager.createSplit(direction: .right); return true
+            case Code.minus: AgenticActions.resize(.left, in: tabManager); return true
+            case Code.equal: AgenticActions.resize(.right, in: tabManager); return true
+            case Code.lbracket: AgenticActions.cycleSub(-1, in: tabManager); return true
+            case Code.rbracket: AgenticActions.cycleSub(1, in: tabManager); return true
+            default: break
+            }
+            switch key {
+            case "w": AgenticActions.closeFocused(in: tabManager); return true
+            case "f": _ = tabManager.toggleFocusedSplitZoom(); return true
+            case "n": AgenticActions.jumpToAttention(in: tabManager); return true
+            default: break
+            }
+        }
+
+        if flags == [cmd, .option] {
+            switch code {
+            case Code.left: AgenticHistory.shared.step(-1, in: tabManager); return true
+            case Code.right: AgenticHistory.shared.step(1, in: tabManager); return true
+            default: break
+            }
+        }
+
+        if flags == [cmd, .shift] {
+            switch code {
+            case Code.minus: AgenticActions.resize(.up, in: tabManager); return true
+            case Code.equal: AgenticActions.resize(.down, in: tabManager); return true
+            case Code.ret: AgenticActions.openWebapp("https://www.google.com", in: tabManager); return true
+            case Code.space:
+                let d = UserDefaults.standard
+                d.set(!d.bool(forKey: AgenticActions.topBarHiddenKey), forKey: AgenticActions.topBarHiddenKey)
+                return true
+            default: break
+            }
+            let apps: [String: String] = [
+                "b": "https://www.google.com", "a": "https://chatgpt.com", "y": "https://youtube.com/",
+                "x": "https://x.com/", "p": "https://photos.google.com/",
+            ]
+            if let url = apps[key] { AgenticActions.openWebapp(url, in: tabManager); return true }
         }
         return false
     }
@@ -127,8 +290,14 @@ struct AgenticTopBar: View {
     @ObservedObject private var notifications = TerminalNotificationStore.shared
 
     static let height: CGFloat = 34
+    @AppStorage(AgenticActions.topBarHiddenKey) private var hidden = false
 
     var body: some View {
+        Group { if !hidden { bar } }
+            .onReceive(tabManager.selectedTabIdPublisher) { AgenticHistory.shared.record($0) }
+    }
+
+    private var bar: some View {
         HStack(spacing: 0) {
             // Clear the traffic lights.
             Spacer().frame(width: 78)
