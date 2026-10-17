@@ -7,10 +7,8 @@ enum TelemetrySettings {
     // live in `CmuxSettings` (`AppCatalogSection().sendAnonymousTelemetry`) as the
     // single source of truth; this anchor only freezes that read for the lifetime
     // of the launch.
-    static let enabledForCurrentLaunch = resolveEnabled(
-        userOptIn: AppCatalogSection().sendAnonymousTelemetry.value(in: .standard),
-        policy: ManagedDevicePolicy()
-    )
+    // HyprMux is a fork: it never reports to upstream's analytics or crash services.
+    static let enabledForCurrentLaunch = false
 
     /// `DisableTelemetry` (MDM) wins over the user opt-in. Frozen for the
     /// launch like the opt-in itself, so a profile pushed mid-session applies
