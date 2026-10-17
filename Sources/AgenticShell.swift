@@ -170,8 +170,9 @@ enum AgenticProfile {
 
     /// `r <session>`: attach to (or create) a tmux session on the fleet's first node.
     static func attachCommand(_ session: String) -> String {
-        guard let host = remoteHost else { return "tmux new -A -s '\(session)'" }
-        return "ssh -t \(host) \"tmux new -A -s '\(session)'\""
+        // escape-time 0: tmux otherwise holds a lone Escape for 500ms, which TUIs such as Codex read as lost.
+        guard let host = remoteHost else { return "tmux new -A -s '\(session)' \\; set -s escape-time 0" }
+        return "ssh -t \(host) \"tmux new -A -s '\(session)' \\; set -s escape-time 0\""
     }
 }
 
@@ -375,14 +376,6 @@ enum AgenticKeymap {
     }
 
     static func handle(event: NSEvent, tabManager: TabManager?) -> Bool {
-        if let h = FileHandle(forWritingAtPath: "/tmp/agentic-keys.log") ?? {
-            FileManager.default.createFile(atPath: "/tmp/agentic-keys.log", contents: nil)
-            return FileHandle(forWritingAtPath: "/tmp/agentic-keys.log")
-        }() {
-            h.seekToEndOfFile()
-            h.write("key \(event.keyCode) flags=\(event.modifierFlags.rawValue) tm=\(tabManager != nil)\n".data(using: .utf8)!)
-            h.closeFile()
-        }
         guard let tabManager else { return false }
         let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
             .subtracting([.numericPad, .function, .capsLock])
