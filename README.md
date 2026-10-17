@@ -269,6 +269,24 @@ source change: edit `Sources/AgenticShell.swift` (top bar `AgenticTopBar`, dock
 `AgenticDock`/`AgenticBottomBar`, keybinds `AgenticKeymap.handle`), rebuild as in
 [Build and run](#build-and-run), and run `scripts/hyprmux-install.sh`.
 
+## License and attribution
+
+HyprMux is a modified version of **cmux**, Copyright (c) 2024-present Manaflow, Inc.,
+and is distributed under the same license, **GPL-3.0-or-later** ([`LICENSE`](LICENSE)).
+Third-party components keep their own licenses ([`THIRD_PARTY_LICENSES.md`](THIRD_PARTY_LICENSES.md)).
+
+- **Modified**: October 2026 onward. The changes (the Hyprland-style shell in
+  `Sources/AgenticShell.swift`, plus edits to `ContentView.swift`, `AppDelegate.swift`,
+  `Workspace.swift`, the app icon, the product name and the build scripts) are visible in
+  this repository's git history against `manaflow-ai/cmux`.
+- **Source**: the complete corresponding source of any HyprMux binary is this repository
+  at the matching commit.
+- **Not covered by the GPL**: the directories that `LICENSE` lists under the Business
+  Source License 1.1 (`web/`, `workers/…`, `services/iroh-relay-minter/`, …) stay under
+  that license. HyprMux does not use them.
+- **Not affiliated**: HyprMux is an independent fork. cmux and Manaflow are not
+  responsible for it, and the cmux name belongs to its owners.
+
 ## Credits
 
 Built on [cmux](https://github.com/manaflow-ai/cmux) and
