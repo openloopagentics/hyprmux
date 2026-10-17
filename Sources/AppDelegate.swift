@@ -15077,6 +15077,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         pendingConfiguredShortcutChord = nil
         defer { activeConfiguredShortcutChordPrefixForCurrentEvent = nil; clearShortcutEventFocusContextCache(for: event) }
 
+        if AgenticKeymap.handle(event: event, tabManager: tabManager) {
+            return true
+        }
+
         // While hint labels show, every key belongs to hint mode first.
         if WindowHintController.shared.isActive {
             if matchConfiguredShortcut(event: event, action: .showWindowHints) {

@@ -8171,7 +8171,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux Computer Use: Running in Background"
+            "value": "HyprMux Computer Use: Running in Background"
           }
         },
         "ja": {
@@ -8289,7 +8289,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Focus cmux Computer Use"
+            "value": "Focus HyprMux Computer Use"
           }
         },
         "ja": {
@@ -8678,7 +8678,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux Computer Use"
+            "value": "HyprMux Computer Use"
           }
         },
         "ja": {
@@ -8819,7 +8819,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "View cmux Computer Use"
+            "value": "View HyprMux Computer Use"
           }
         },
         "ja": {
@@ -8878,7 +8878,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Allows cmux to access app interfaces"
+            "value": "Allows HyprMux to access app interfaces"
           }
         },
         "ja": {
@@ -9822,7 +9822,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux Computer Use Is Ready"
+            "value": "HyprMux Computer Use Is Ready"
           }
         },
         "ja": {
@@ -10419,7 +10419,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Enable cmux Computer Use"
+            "value": "Enable HyprMux Computer Use"
           }
         },
         "ja": {
@@ -10950,7 +10950,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Runs locally with separate cmux Computer Use permissions"
+            "value": "Runs locally with separate HyprMux Computer Use permissions"
           }
         },
         "ja": {
@@ -11481,7 +11481,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Preparing cmux Computer Use…"
+            "value": "Preparing HyprMux Computer Use…"
           }
         },
         "ja": {
@@ -11540,7 +11540,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Allows cmux Computer Use to see app windows and screen content"
+            "value": "Allows HyprMux Computer Use to see app windows and screen content"
           }
         },
         "ja": {
@@ -11776,7 +11776,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux uses screenshots to know where to click"
+            "value": "HyprMux uses screenshots to know where to click"
           }
         },
         "ja": {
@@ -12130,7 +12130,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux Computer Use Setup"
+            "value": "HyprMux Computer Use Setup"
           }
         },
         "ja": {
@@ -12314,7 +12314,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux Computer Use UX"
+            "value": "HyprMux Computer Use UX"
           }
         },
         "ja": {
@@ -12373,7 +12373,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Enable cmux Computer Use"
+            "value": "Enable HyprMux Computer Use"
           }
         },
         "ja": {
@@ -13147,7 +13147,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Show cmux Computer Use in Menu Bar"
+            "value": "Show HyprMux Computer Use in Menu Bar"
           }
         },
         "ja": {
@@ -13560,7 +13560,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux Computer Use"
+            "value": "HyprMux Computer Use"
           }
         },
         "ja": {
@@ -14657,7 +14657,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Unexpected argument '%@' for cmux vault %@"
+            "value": "Unexpected argument '%@' for HyprMux vault %@"
           }
         },
         "ja": {
@@ -22753,7 +22753,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux"
+            "value": "HyprMux"
           }
         },
         "es": {
@@ -23740,7 +23740,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux Project License"
+            "value": "HyprMux Project License"
           }
         },
         "ja": {
@@ -24864,7 +24864,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Couldn’t reach cmux"
+            "value": "Couldn’t reach HyprMux"
           }
         },
         "ja": {
@@ -25100,7 +25100,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux couldn’t complete the sign-in"
+            "value": "HyprMux couldn’t complete the sign-in"
           }
         },
         "ja": {
@@ -25218,7 +25218,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux sign-in is temporarily unavailable"
+            "value": "HyprMux sign-in is temporarily unavailable"
           }
         },
         "ja": {
@@ -25454,7 +25454,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux couldn’t authorize this sign-in"
+            "value": "HyprMux couldn’t authorize this sign-in"
           }
         },
         "ja": {
@@ -25631,7 +25631,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sign in to cmux"
+            "value": "Sign in to HyprMux"
           }
         },
         "ja": {
@@ -48432,7 +48432,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Always allow this host in cmux"
+            "value": "Always allow this host in HyprMux"
           }
         },
         "es": {
@@ -58377,7 +58377,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Created cmux profiles: %@"
+            "value": "Created HyprMux profiles: %@"
           }
         },
         "ja": {
@@ -64324,7 +64324,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Proceed in cmux"
+            "value": "Proceed in HyprMux"
           }
         },
         "es": {
@@ -73646,7 +73646,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "verification: not required (cmux domain)"
+            "value": "verification: not required (HyprMux domain)"
           }
         },
         "ja": {
@@ -75114,7 +75114,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux comments requires a git repository: %@"
+            "value": "HyprMux comments requires a git repository: %@"
           }
         },
         "es": {
@@ -86321,7 +86321,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Removed 0 cmux hook(s) from %@"
+            "value": "Removed 0 HyprMux hook(s) from %@"
           }
         },
         "es": {
@@ -86815,7 +86815,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ exists and is not a cmux extension; leaving it alone"
+            "value": "%@ exists and is not a HyprMux extension; leaving it alone"
           }
         },
         "es": {
@@ -87190,7 +87190,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "No Campfire cmux extension found at %@"
+            "value": "No Campfire HyprMux extension found at %@"
           }
         },
         "es": {
@@ -87315,7 +87315,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Refusing to remove %@: missing cmux marker"
+            "value": "Refusing to remove %@: missing HyprMux marker"
           }
         },
         "es": {
@@ -87440,7 +87440,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Removed Campfire cmux extension from %@"
+            "value": "Removed Campfire HyprMux extension from %@"
           }
         },
         "es": {
@@ -88654,7 +88654,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Removed 0 cmux hook(s) from %@"
+            "value": "Removed 0 HyprMux hook(s) from %@"
           }
         },
         "es": {
@@ -89456,7 +89456,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ exists and is not a cmux extension; leaving it alone"
+            "value": "%@ exists and is not a HyprMux extension; leaving it alone"
           }
         },
         "es": {
@@ -89831,7 +89831,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "No OMP cmux extension found at %@"
+            "value": "No OMP HyprMux extension found at %@"
           }
         },
         "es": {
@@ -89956,7 +89956,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Refusing to remove %@: missing cmux marker"
+            "value": "Refusing to remove %@: missing HyprMux marker"
           }
         },
         "es": {
@@ -90081,7 +90081,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Removed OMP cmux extension from %@"
+            "value": "Removed OMP HyprMux extension from %@"
           }
         },
         "es": {
@@ -90557,7 +90557,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux did not receive acknowledgment for Pi feed ingestion"
+            "value": "HyprMux did not receive acknowledgment for Pi feed ingestion"
           }
         },
         "ja": {
@@ -90640,7 +90640,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ exists and is not a cmux extension; leaving it alone"
+            "value": "%@ exists and is not a HyprMux extension; leaving it alone"
           }
         },
         "es": {
@@ -91015,7 +91015,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "No Pi cmux extension found at %@"
+            "value": "No Pi HyprMux extension found at %@"
           }
         },
         "es": {
@@ -91140,7 +91140,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Refusing to remove %@: missing cmux marker"
+            "value": "Refusing to remove %@: missing HyprMux marker"
           }
         },
         "es": {
@@ -91265,7 +91265,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Removed Pi cmux extension from %@"
+            "value": "Removed Pi HyprMux extension from %@"
           }
         },
         "es": {
@@ -91628,7 +91628,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Couldn't Install cmux CLI"
+            "value": "Couldn't Install HyprMux CLI"
           }
         },
         "es": {
@@ -91747,7 +91747,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux CLI Installed"
+            "value": "HyprMux CLI Installed"
           }
         },
         "es": {
@@ -92873,7 +92873,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux memory requires a running cmux build that supports memory diagnostics"
+            "value": "HyprMux memory requires a running HyprMux build that supports memory diagnostics"
           }
         },
         "es": {
@@ -97028,7 +97028,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Failed to activate cmux"
+            "value": "Failed to activate HyprMux"
           }
         },
         "ja": {
@@ -97087,7 +97087,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Failed to launch cmux"
+            "value": "Failed to launch HyprMux"
           }
         },
         "ja": {
@@ -97146,7 +97146,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Failed to open %@ in cmux"
+            "value": "Failed to open %@ in HyprMux"
           }
         },
         "ja": {
@@ -98132,7 +98132,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "restore: waiting for cmux to verify that this agent session is not already running…"
+            "value": "restore: waiting for HyprMux to verify that this agent session is not already running…"
           }
         },
         "ja": {
@@ -105414,7 +105414,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "No active cmux window"
+            "value": "No active HyprMux window"
           }
         },
         "ja": {
@@ -114416,7 +114416,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux top requires a running cmux build that supports process diagnostics"
+            "value": "HyprMux top requires a running HyprMux build that supports process diagnostics"
           }
         },
         "es": {
@@ -114892,7 +114892,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Couldn't Uninstall cmux CLI"
+            "value": "Couldn't Uninstall HyprMux CLI"
           }
         },
         "es": {
@@ -115011,7 +115011,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux CLI Uninstalled"
+            "value": "HyprMux CLI Uninstalled"
           }
         },
         "es": {
@@ -120607,7 +120607,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "[cmux] connection lost — reconnecting (attempt %d)…"
+            "value": "[HyprMux] connection lost — reconnecting (attempt %d)…"
           }
         },
         "zh-Hans": {
@@ -128418,7 +128418,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Open Full cmux-tui Client"
+            "value": "Open Full HyprMux-tui Client"
           }
         },
         "ja": {
@@ -138922,7 +138922,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux"
+            "value": "HyprMux"
           }
         },
         "ja": {
@@ -140635,7 +140635,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Disable cmux Browser"
+            "value": "Disable HyprMux Browser"
           }
         },
         "ja": {
@@ -140877,7 +140877,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Enable cmux Browser"
+            "value": "Enable HyprMux Browser"
           }
         },
         "ja": {
@@ -141735,7 +141735,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Shell Command: Install 'cmux' in PATH"
+            "value": "Shell Command: Install 'HyprMux' in PATH"
           }
         },
         "es": {
@@ -142186,7 +142186,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Make cmux the Default Terminal"
+            "value": "Make HyprMux the Default Terminal"
           }
         },
         "ja": {
@@ -147204,7 +147204,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Upgrade to cmux Pro"
+            "value": "Upgrade to HyprMux Pro"
           }
         },
         "ja": {
@@ -147263,7 +147263,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Welcome to cmux Pro"
+            "value": "Welcome to HyprMux Pro"
           }
         },
         "ja": {
@@ -152572,7 +152572,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Shell Command: Uninstall 'cmux' from PATH"
+            "value": "Shell Command: Uninstall 'HyprMux' from PATH"
           }
         },
         "es": {
@@ -165285,7 +165285,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux crashed during your last session"
+            "value": "HyprMux crashed during your last session"
           }
         },
         "ja": {
@@ -172524,7 +172524,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux terminal transparency"
+            "value": "HyprMux terminal transparency"
           }
         },
         "ja": {
@@ -183137,7 +183137,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Enable Notifications for cmux"
+            "value": "Enable Notifications for HyprMux"
           }
         },
         "es": {
@@ -184386,7 +184386,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Quit cmux?"
+            "value": "Quit HyprMux?"
           }
         },
         "es": {
@@ -187098,7 +187098,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux SSH Link Blocked"
+            "value": "HyprMux SSH Link Blocked"
           }
         },
         "ja": {
@@ -188872,7 +188872,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Open SSH Workspace in cmux?"
+            "value": "Open SSH Workspace in HyprMux?"
           }
         },
         "ja": {
@@ -189080,7 +189080,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux Link Blocked"
+            "value": "HyprMux Link Blocked"
           }
         },
         "es": {
@@ -225438,7 +225438,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Open in cmux"
+            "value": "Open in HyprMux"
           }
         },
         "ja": {
@@ -231116,7 +231116,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Checking your cmux account…"
+            "value": "Checking your HyprMux account…"
           }
         },
         "ja": {
@@ -233647,7 +233647,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Subscribe to cmux Pro to create Cloud machines"
+            "value": "Subscribe to HyprMux Pro to create Cloud machines"
           }
         },
         "ja": {
@@ -239518,7 +239518,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Cloud machines need cmux Pro"
+            "value": "Cloud machines need HyprMux Pro"
           }
         },
         "ja": {
@@ -242956,7 +242956,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "About cmux"
+            "value": "About HyprMux"
           }
         },
         "es": {
@@ -243348,7 +243348,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Make cmux the Default Terminal"
+            "value": "Make HyprMux the Default Terminal"
           }
         },
         "ja": {
@@ -247836,7 +247836,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Upgrade to cmux Pro…"
+            "value": "Upgrade to HyprMux Pro…"
           }
         },
         "ja": {
@@ -255786,7 +255786,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Quit cmux"
+            "value": "Quit HyprMux"
           }
         },
         "es": {
@@ -263444,7 +263444,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Get cmux for iPhone"
+            "value": "Get HyprMux for iPhone"
           }
         },
         "ja": {
@@ -263961,7 +263961,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Download cmux for"
+            "value": "Download HyprMux for"
           }
         },
         "es": {
@@ -265968,7 +265968,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux"
+            "value": "HyprMux"
           }
         },
         "ja": {
@@ -266027,7 +266027,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux BETA"
+            "value": "HyprMux BETA"
           }
         },
         "ja": {
@@ -266050,7 +266050,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux DEMO"
+            "value": "HyprMux DEMO"
           }
         },
         "ja": {
@@ -266073,7 +266073,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux DEV %@"
+            "value": "HyprMux DEV %@"
           }
         },
         "ja": {
@@ -266096,7 +266096,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux INTERNAL"
+            "value": "HyprMux INTERNAL"
           }
         },
         "ja": {
@@ -274346,7 +274346,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux Pro"
+            "value": "HyprMux Pro"
           }
         },
         "ja": {
@@ -275525,7 +275525,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux iOS app and email support"
+            "value": "HyprMux iOS app and email support"
           }
         },
         "ja": {
@@ -277295,7 +277295,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux Upgrade"
+            "value": "HyprMux Upgrade"
           }
         },
         "ja": {
@@ -277767,7 +277767,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux AI early access + priority support"
+            "value": "HyprMux AI early access + priority support"
           }
         },
         "ja": {
@@ -277826,7 +277826,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux Pro"
+            "value": "HyprMux Pro"
           }
         },
         "ja": {
@@ -277902,7 +277902,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux Pro"
+            "value": "HyprMux Pro"
           }
         },
         "ja": {
@@ -278391,7 +278391,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux Pro"
+            "value": "HyprMux Pro"
           }
         },
         "ja": {
@@ -278408,7 +278408,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Welcome to cmux Pro"
+            "value": "Welcome to HyprMux Pro"
           }
         },
         "ja": {
@@ -279626,7 +279626,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux Notification Test"
+            "value": "HyprMux Notification Test"
           }
         },
         "es": {
@@ -280776,7 +280776,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "[cmux] remote session disconnected: %s"
+            "value": "[HyprMux] remote session disconnected: %s"
           }
         },
         "es": {
@@ -282529,7 +282529,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "remote daemon does not support persistent SSH PTY sessions; reconnect the remote workspace to update cmux"
+            "value": "remote daemon does not support persistent SSH PTY sessions; reconnect the remote workspace to update HyprMux"
           }
         },
         "es": {
@@ -282653,7 +282653,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "remote daemon is missing required functionality; reconnect the remote workspace to update cmux"
+            "value": "remote daemon is missing required functionality; reconnect the remote workspace to update HyprMux"
           }
         },
         "es": {
@@ -285539,7 +285539,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "remote session server is too old (found %@; cmux needs version %@ or newer)"
+            "value": "remote session server is too old (found %@; HyprMux needs version %@ or newer)"
           }
         },
         "es": {
@@ -285664,7 +285664,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux could not create a new window"
+            "value": "HyprMux could not create a new window"
           }
         },
         "es": {
@@ -286692,7 +286692,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pick one with: cmux right-sidebar set custom <name>"
+            "value": "Pick one with: HyprMux right-sidebar set custom <name>"
           }
         },
         "ja": {
@@ -294496,7 +294496,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux Pro"
+            "value": "HyprMux Pro"
           }
         },
         "ja": {
@@ -295406,7 +295406,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux Blue"
+            "value": "HyprMux Blue"
           }
         },
         "es": {
@@ -297551,7 +297551,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Set cmux as default terminal?"
+            "value": "Set HyprMux as default terminal?"
           }
         },
         "ja": {
@@ -300340,7 +300340,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Restart cmux to apply"
+            "value": "Restart HyprMux to apply"
           }
         },
         "es": {
@@ -302226,7 +302226,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Open Markdown in cmux Viewer"
+            "value": "Open Markdown in HyprMux Viewer"
           }
         },
         "es": {
@@ -302374,7 +302374,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Open Sidebar PR Links in cmux Browser"
+            "value": "Open Sidebar PR Links in HyprMux Browser"
           }
         },
         "es": {
@@ -302611,7 +302611,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Open Sidebar Port Links in cmux Browser"
+            "value": "Open Sidebar Port Links in HyprMux Browser"
           }
         },
         "es": {
@@ -302706,7 +302706,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Open Supported Files in cmux"
+            "value": "Open Supported Files in HyprMux"
           }
         },
         "ja": {
@@ -315469,7 +315469,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Enable cmux Browser"
+            "value": "Enable HyprMux Browser"
           }
         },
         "ja": {
@@ -320231,7 +320231,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Open Terminal Links in cmux Browser"
+            "value": "Open Terminal Links in HyprMux Browser"
           }
         },
         "es": {
@@ -324958,7 +324958,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux"
+            "value": "HyprMux"
           }
         },
         "ja": {
@@ -330195,7 +330195,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Allow outbound HTTPS and WebSocket access to these cmux relay origins:"
+            "value": "Allow outbound HTTPS and WebSocket access to these HyprMux relay origins:"
           }
         },
         "ja": {
@@ -331080,7 +331080,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux Connection Report"
+            "value": "HyprMux Connection Report"
           }
         },
         "ja": {
@@ -335357,7 +335357,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Verified from cmux"
+            "value": "Verified from HyprMux"
           }
         },
         "ja": {
@@ -335593,7 +335593,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Selected cmux Relays"
+            "value": "Selected HyprMux Relays"
           }
         },
         "ja": {
@@ -340079,7 +340079,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux test notification"
+            "value": "HyprMux test notification"
           }
         },
         "es": {
@@ -358034,7 +358034,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "tmux prefix ctrl-b control-b multi key sequence chord cmux json"
+            "value": "tmux prefix ctrl-b control-b multi key sequence chord HyprMux json"
           }
         },
         "es": {
@@ -358153,7 +358153,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "hotkeys keybindings key bindings commands keyboard accelerators shortcuts cmux json"
+            "value": "hotkeys keybindings key bindings commands keyboard accelerators shortcuts HyprMux json"
           }
         },
         "es": {
@@ -358661,7 +358661,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "iroh relay preference automatic managed selected cmux fleet provider region account"
+            "value": "iroh relay preference automatic managed selected HyprMux fleet provider region account"
           }
         },
         "ja": {
@@ -358981,7 +358981,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "docs documentation schema reference cmux json keys configuration"
+            "value": "docs documentation schema reference HyprMux json keys configuration"
           }
         },
         "es": {
@@ -400219,7 +400219,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Welcome to cmux!"
+            "value": "Welcome to HyprMux!"
           }
         },
         "ja": {
@@ -401814,7 +401814,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux"
+            "value": "HyprMux"
           }
         },
         "ja": {
@@ -430226,7 +430226,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux"
+            "value": "HyprMux"
           }
         },
         "ja": {
@@ -430698,7 +430698,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux mascot"
+            "value": "HyprMux mascot"
           }
         },
         "ja": {
@@ -432409,7 +432409,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux"
+            "value": "HyprMux"
           }
         },
         "ja": {
@@ -432704,7 +432704,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Unlock cmux Sleepy Mode"
+            "value": "Unlock HyprMux Sleepy Mode"
           }
         },
         "ja": {
@@ -433471,7 +433471,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Access denied - only processes started inside cmux can connect"
+            "value": "Access denied - only processes started inside HyprMux can connect"
           }
         },
         "ja": {
@@ -440377,7 +440377,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux processes only"
+            "value": "HyprMux processes only"
           }
         },
         "es": {
@@ -444457,7 +444457,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Send a cmux profile"
+            "value": "Send a HyprMux profile"
           }
         },
         "ja": {
@@ -445165,7 +445165,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Profiling cmux"
+            "value": "Profiling HyprMux"
           }
         },
         "ja": {
@@ -445307,7 +445307,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Show cmux"
+            "value": "Show HyprMux"
           }
         },
         "es": {
@@ -446827,7 +446827,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "A process wants cmux to keep this resume command for the current terminal:\n\nWorking directory: %@\n\n%@"
+            "value": "A process wants HyprMux to keep this resume command for the current terminal:\n\nWorking directory: %@\n\n%@"
           }
         },
         "ja": {
@@ -447004,7 +447004,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux is restoring a terminal with this resume command:\n\nWorking directory: %@\n\n%@"
+            "value": "HyprMux is restoring a terminal with this resume command:\n\nWorking directory: %@\n\n%@"
           }
         },
         "ja": {
@@ -473004,7 +473004,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The group anchor was not generated by cmux"
+            "value": "The group anchor was not generated by HyprMux"
           }
         },
         "ja": {
@@ -486063,7 +486063,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux could not open a local port for the forward: %@"
+            "value": "HyprMux could not open a local port for the forward: %@"
           }
         },
         "ja": {
@@ -486830,7 +486830,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The cmux Cloud Tunnel is stopping…"
+            "value": "The HyprMux Cloud Tunnel is stopping…"
           }
         },
         "ja": {
@@ -493469,7 +493469,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux Cloud"
+            "value": "HyprMux Cloud"
           }
         },
         "ja": {
@@ -495003,7 +495003,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The cmux Cloud Tunnel is starting…"
+            "value": "The HyprMux Cloud Tunnel is starting…"
           }
         },
         "ja": {
@@ -495121,7 +495121,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The cmux Cloud Tunnel could not start: %@"
+            "value": "The HyprMux Cloud Tunnel could not start: %@"
           }
         },
         "ja": {
@@ -509810,7 +509810,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "sudo: too many approval requests are pending; resolve one in cmux and retry"
+            "value": "sudo: too many approval requests are pending; resolve one in HyprMux and retry"
           }
         },
         "ja": {
@@ -509935,7 +509935,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "sudo: could not start Touch ID setup; reinstall cmux and retry"
+            "value": "sudo: could not start Touch ID setup; reinstall HyprMux and retry"
           }
         },
         "ja": {
@@ -510060,7 +510060,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "sudo: could not open cmux for approval; open cmux and retry"
+            "value": "sudo: could not open HyprMux for approval; open HyprMux and retry"
           }
         },
         "ja": {
@@ -511435,7 +511435,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "sudo: request %@ queued; waiting up to %d seconds for approval in cmux…"
+            "value": "sudo: request %@ queued; waiting up to %d seconds for approval in HyprMux…"
           }
         },
         "ja": {
@@ -511560,7 +511560,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "sudo: request %@ queued; waiting up to 1 second for approval in cmux…"
+            "value": "sudo: request %@ queued; waiting up to 1 second for approval in HyprMux…"
           }
         },
         "ja": {
@@ -511935,7 +511935,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "sudo: could not start secure execution; retry from a cmux terminal"
+            "value": "sudo: could not start secure execution; retry from a HyprMux terminal"
           }
         },
         "ja": {
@@ -512060,7 +512060,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "sudo: use the cmux CLI included with the cmux app, then retry"
+            "value": "sudo: use the HyprMux CLI included with the HyprMux app, then retry"
           }
         },
         "ja": {
@@ -528050,7 +528050,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Usage: cmux auth team create <name>"
+            "value": "Usage: HyprMux auth team create <name>"
           }
         },
         "de": {
@@ -528286,7 +528286,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Usage: cmux auth team use <team-id>"
+            "value": "Usage: HyprMux auth team use <team-id>"
           }
         },
         "de": {
@@ -528345,7 +528345,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Usage: cmux auth <status|login|logout|team>"
+            "value": "Usage: HyprMux auth <status|login|logout|team>"
           }
         },
         "de": {
@@ -537695,7 +537695,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "This cmux build has no remote daemon for the remote host's platform"
+            "value": "This HyprMux build has no remote daemon for the remote host's platform"
           }
         },
         "ja": {
@@ -545201,7 +545201,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "a cmux Markdown viewer terminal"
+            "value": "a HyprMux Markdown viewer terminal"
           }
         },
         "de": {
@@ -555468,7 +555468,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux (Default)"
+            "value": "HyprMux (Default)"
           }
         },
         "ar": {
@@ -571328,7 +571328,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "  (Antigravity, Claude Code, Grok, Muse, and Pi hooks are injected automatically via cmux wrappers)"
+            "value": "  (Antigravity, Claude Code, Grok, Muse, and Pi hooks are injected automatically via HyprMux wrappers)"
           }
         },
         "ar": {
@@ -578533,7 +578533,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Cloud machines need cmux Pro — showing last known"
+            "value": "Cloud machines need HyprMux Pro — showing last known"
           }
         },
         "ar": {
@@ -585831,7 +585831,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Open in cmux"
+            "value": "Open in HyprMux"
           }
         },
         "ar": {
@@ -589240,7 +589240,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Cloud machines need cmux Pro"
+            "value": "Cloud machines need HyprMux Pro"
           }
         },
         "ar": {
@@ -589358,7 +589358,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Could not reach cmux Cloud"
+            "value": "Could not reach HyprMux Cloud"
           }
         },
         "ar": {
@@ -590066,7 +590066,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sign In to cmux Cloud…"
+            "value": "Sign In to HyprMux Cloud…"
           }
         },
         "ar": {
@@ -590486,7 +590486,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Open Link in cmux Browser"
+            "value": "Open Link in HyprMux Browser"
           }
         },
         "ar": {
@@ -601779,7 +601779,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Usage: cmux auth team accept|decline <invitation-id>"
+            "value": "Usage: HyprMux auth team accept|decline <invitation-id>"
           }
         },
         "ar": {
@@ -602192,7 +602192,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux Cloud team"
+            "value": "HyprMux Cloud team"
           }
         },
         "ar": {
@@ -605260,7 +605260,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux pr requires a git repository in the current directory"
+            "value": "HyprMux pr requires a git repository in the current directory"
           }
         },
         "de": {
@@ -605319,7 +605319,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux pr expects a pull-request URL or a positive pull-request number"
+            "value": "HyprMux pr expects a pull-request URL or a positive pull-request number"
           }
         },
         "de": {
@@ -605378,7 +605378,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux pr could not resolve the pull request; check authentication and try again"
+            "value": "HyprMux pr could not resolve the pull request; check authentication and try again"
           }
         },
         "de": {
@@ -605437,7 +605437,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux pr received invalid pull-request information"
+            "value": "HyprMux pr received invalid pull-request information"
           }
         },
         "de": {
@@ -605496,7 +605496,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux pr: the pull request does not belong to the detected repository"
+            "value": "HyprMux pr: the pull request does not belong to the detected repository"
           }
         },
         "de": {
@@ -606687,7 +606687,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Open it with: cmux sidebar open %@"
+            "value": "Open it with: HyprMux sidebar open %@"
           }
         },
         "ar": {
@@ -609401,7 +609401,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Open it with: cmux sidebar open %@"
+            "value": "Open it with: HyprMux sidebar open %@"
           }
         },
         "ar": {
@@ -609519,7 +609519,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Usage: cmux sidebar try <template>"
+            "value": "Usage: HyprMux sidebar try <template>"
           }
         },
         "ar": {
@@ -612693,7 +612693,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Cloud Machines require cmux Pro"
+            "value": "Cloud Machines require HyprMux Pro"
           }
         },
         "ar": {
@@ -613693,7 +613693,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Checking your cmux plan…"
+            "value": "Checking your HyprMux plan…"
           }
         },
         "ar": {
@@ -620648,7 +620648,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sign in to cmux from a link?"
+            "value": "Sign in to HyprMux from a link?"
           }
         },
         "ja": {
@@ -620707,7 +620707,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Switch cmux to another account?"
+            "value": "Switch HyprMux to another account?"
           }
         },
         "ja": {
@@ -627972,7 +627972,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Invalid cmux review receipt: %@"
+            "value": "Invalid HyprMux review receipt: %@"
           }
         },
         "ar": {
@@ -628149,7 +628149,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "cmux review requires a git repository: %@"
+            "value": "HyprMux review requires a git repository: %@"
           }
         },
         "ar": {
@@ -633813,7 +633813,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Update cmux on Your Mac"
+            "value": "Update HyprMux on Your Mac"
           }
         },
         "ar": {
@@ -634167,7 +634167,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Update cmux on your Mac"
+            "value": "Update HyprMux on your Mac"
           }
         },
         "ar": {
@@ -642864,7 +642864,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "transport is not one cmux knows; use ssh or et"
+            "value": "transport is not one HyprMux knows; use ssh or et"
           }
         },
         "ar": {
@@ -653415,7 +653415,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Upgrade to cmux Max"
+            "value": "Upgrade to HyprMux Max"
           }
         },
         "ar": {
@@ -653474,7 +653474,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Upgrade to cmux Max…"
+            "value": "Upgrade to HyprMux Max…"
           }
         },
         "ar": {

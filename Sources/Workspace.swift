@@ -4078,9 +4078,12 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
             increaseContrast: DisplayAccessibilityOptions.current.increaseContrast
         )
         return BonsplitConfiguration.Appearance(
-            tabBarHeight: WindowChromeMetrics.bonsplitTabBarHeight,
+            // Agentic shell: panes are plain terminals, no per-pane tab strip.
+            tabBarHeight: 1,
             tabTitleFontSize: tabTitleFontSize,
+            dividerThickness: 6,
             dividerHitExpansion: PortalSplitDividerRegion.dividerHitExpansion,
+            showSplitButtons: false,
             splitButtonBackdropEffect: Self.bonsplitSplitButtonBackdropEffect(),
             splitButtonTooltips: Self.currentSplitButtonTooltips(),
             enableAnimations: false,
