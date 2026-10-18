@@ -281,9 +281,11 @@ Third-party components keep their own licenses ([`THIRD_PARTY_LICENSES.md`](THIR
   this repository's git history against `manaflow-ai/cmux`.
 - **Source**: the complete corresponding source of any HyprMux binary is this repository
   at the matching commit.
-- **Not covered by the GPL**: the directories that `LICENSE` lists under the Business
-  Source License 1.1 (`web/`, `workers/…`, `services/iroh-relay-minter/`, …) stay under
-  that license. HyprMux does not use them.
+- **Removed**: the cmux server directories that `LICENSE` lists under the Business Source
+  License 1.1 (`web/`, `workers/ci-artifacts/`, `workers/iroh-v2/`, `workers/presence/`,
+  `services/iroh-relay-minter/`, `cmux-tui/relays/cloudflare-do/`) are not part of HyprMux
+  and were deleted from this fork. Everything left is GPL-3.0-or-later or a third-party
+  license. (`LICENSE` is kept as upstream wrote it, so it still names those directories.)
 - **Not affiliated**: HyprMux is an independent fork. cmux and Manaflow are not
   responsible for it, and the cmux name belongs to its owners.
 
