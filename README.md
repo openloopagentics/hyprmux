@@ -1,14 +1,13 @@
-# HyprMux
+<h1 align="center">HyprMux</h1>
+<p align="center"><b>Hyprland on macOS.</b> A terminal with a waybar-style top bar, a project dock,<br/>
+dwindle tiling, workspaces, ssh + tmux terminals and live status for your AI coding agents.</p>
 
-A macOS terminal that behaves like a maximized [Hyprland](https://hypr.land) desktop:
-a waybar-style top bar, a Touch-Bar-style project dock along the bottom, dwindle
-tiling, numbered / named / sub-workspaces, wallpapers, remote (ssh + tmux)
-terminals, live status icons for coding agents, and a browser pane. **Super is
-Cmd.** There is no sidebar and there are no per-pane tabs.
-
-HyprMux is a fork of [cmux](https://github.com/manaflow-ai/cmux) (Ghostty
-terminals, the bonsplit pane library). The upstream README is kept as
-[`README.cmux.md`](README.cmux.md). License: GPL-3.0-or-later, as upstream.
+<p align="center">
+  <a href="https://github.com/openloopagentics/hyprmux/releases/latest">Download</a> ·
+  <a href="#configuration-at-a-glance">Configure</a> ·
+  <a href="#for-ai-agents-customizing-a-users-bars">Let your agent set it up</a> ·
+  <a href="#how-hyprmux-relates-to-cmux">About cmux</a>
+</p>
 
 <p align="center">
   <img src="./docs/assets/hyprmux-screenshot.png" alt="HyprMux: a waybar-style top bar, three dwindle-tiled terminals, and the project dock" width="900" />
@@ -18,11 +17,60 @@ terminals, the bonsplit pane library). The upstream README is kept as
   <img src="./docs/assets/hyprmux-demo.gif" alt="Opening a project, a browser pane, agent status icons and switching workspaces" width="900" />
 </p>
 
-<sub>Demo content only: a throwaway profile and a sample repo, captured from an isolated instance (see `HYPRMUX_HOME` below).</sub>
+<p align="center"><sub>Demo content only: a throwaway profile and a sample repo, captured from an isolated instance (see <code>HYPRMUX_HOME</code> below).</sub></p>
+
+## What it is
+
+If you live in a tiling Linux desktop, HyprMux gives you that muscle memory on a Mac:
+maximize the window and it behaves like a [Hyprland](https://hypr.land) session, with
+**Super = Cmd**. There is no sidebar and there are no per-pane tabs.
+
+- **Top bar** (waybar-style): workspace pills, the current title, notifications, a theme picker, the clock, and one status icon per running coding agent.
+- **Project dock** (Touch-Bar-style): a row of project buttons along the bottom, in layers (projects, customers, machines). Press `Cmd+Shift+<letter>` or click.
+- **Dwindle tiling**: each new terminal splits the focused one along its longer side, like Hyprland, with gaps and keyboard resizing.
+- **Workspaces**: numbered (`Cmd+1…9`), named (`api.1`), and sub-workspaces (`Cmd+]` makes `api.2`). A workspace you leave empty closes itself.
+- **Remote terminals**: a project opens three terminals attached to tmux sessions on your own machines over ssh, and they reattach when you relaunch.
+- **Agent status**: Any coding agent whose hooks append to a log file shows up as a spinner, a green dot (done) or a pink dot (needs you).
+- **Browser pane**: `Cmd+Shift+B` and friends open a web page as a pane.
+- **Wallpapers and themes**: a wallpaper under the tiles, six fixed terminal themes that never follow light/dark mode.
+- **Plain-file config, written for agents**: two small text files describe the bars, and this README tells your AI agent how to edit them.
+
+## Install
+
+1. Download `HyprMux-<version>.dmg` from the [latest release](https://github.com/openloopagentics/hyprmux/releases/latest).
+2. Open it and drag **HyprMux** to **Applications**.
+
+macOS 14 or later, Apple silicon or Intel. The app is signed with a Developer ID and
+notarized by Apple. It has no update checker (download new releases yourself) and sends
+no telemetry. Browser passkeys and the shared keychain group are not available in this build.
+
+## Quick start
+
+1. Launch it. With no configuration you get placeholder projects (`alpha` … `lambda`) and local shells. Try `Cmd+Shift+O` to open a project, then `Cmd+Return` for another terminal and `Cmd+1…9` for numbered workspaces.
+2. Make it yours: write `~/.config/agentic-laptop/bar.toml` ([format](#bartoml-reference)) and, for remote terminals and agent status, `~/.config/claude-badged/fleet` ([format](#fleet-reference)). Restart HyprMux.
+3. Or skip the typing: tell your coding agent *"read the HyprMux README and set up my bars"*. See [For AI agents](#for-ai-agents-customizing-a-users-bars).
+
+## How HyprMux relates to cmux
+
+HyprMux is a fork of [**cmux**](https://github.com/manaflow-ai/cmux), the Ghostty-based macOS
+terminal by Manaflow. cmux provides the engine this is built on: Ghostty terminal rendering,
+the pane layout library, the browser panel and the notification plumbing. HyprMux replaces
+cmux's sidebar-and-tabs interface with the Hyprland-style shell above (almost all of it in
+[`Sources/AgenticShell.swift`](Sources/AgenticShell.swift)), and differs in a few practical ways:
+
+- its own app name, icon and bundle identifier (`com.openloopagentics.hyprmux`), so it can sit next to cmux;
+- no update feed and no telemetry;
+- the cmux server directories under the Business Source License were removed.
+
+It is an independent project and not affiliated with Manaflow. Thanks to the cmux and
+Ghostty authors. The upstream README is kept as [`README.cmux.md`](README.cmux.md), and
+[License and attribution](#license-and-attribution) has the details. HyprMux is
+GPL-3.0-or-later, like cmux.
 
 ## Contents
 
-- [Build and run](#build-and-run)
+- [What it is](#what-it-is) · [Install](#install) · [Quick start](#quick-start)
+- [Build from source](#build-and-run)
 - [Configuration at a glance](#configuration-at-a-glance)
 - [`bar.toml` reference](#bartoml-reference)
 - [`fleet` reference](#fleet-reference)
@@ -30,6 +78,7 @@ terminals, the bonsplit pane library). The upstream README is kept as
 - [Themes, wallpapers, icons](#themes-wallpapers-icons)
 - [Keybindings](#keybindings)
 - [For AI agents: customizing a user's bars](#for-ai-agents-customizing-a-users-bars)
+- [License and attribution](#license-and-attribution)
 
 ## Build and run
 
@@ -37,14 +86,19 @@ Requirements: macOS, Xcode, `zig` 0.16 (`brew install zig@0.16`, then put
 `/opt/homebrew/opt/zig@0.16/bin` on `PATH`).
 
 ```bash
-./scripts/setup.sh                      # one time: submodules, GhosttyKit
-CMUX_DEV_BACKEND_MODE=local ./scripts/reload.sh --tag mine   # build a tagged dev app
-scripts/hyprmux-install.sh mine         # copy it to ~/Applications/HyprMux.app
-open ~/Applications/HyprMux.app
+./scripts/setup.sh        # one time: submodules, GhosttyKit
+xcodebuild -project cmux.xcodeproj -scheme cmux -configuration Debug \
+  -derivedDataPath build/dd build
+open "build/dd/Build/Products/Debug/cmux DEV.app"
 ```
 
-After every rebuild run `reload.sh` **and** `hyprmux-install.sh`; otherwise the
-installed app is a stale copy. The shell lives in `Sources/AgenticShell.swift`.
+This builds the development app, `cmux DEV.app` (the Debug configuration keeps cmux's
+dev names; the release build is called HyprMux). Rebuild after changing anything in
+`Sources/`. The shell lives in `Sources/AgenticShell.swift`.
+
+To run with a throwaway profile instead of yours, launch the binary with
+`HYPRMUX_HOME=/some/folder "build/dd/Build/Products/Debug/cmux DEV.app/Contents/MacOS/cmux DEV"`
+(see [Configuration](#configuration-at-a-glance)).
 
 ## Configuration at a glance
 
