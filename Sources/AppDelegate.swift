@@ -1919,7 +1919,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         // `DisableTelemetry` (MDM) also stops the remote feature-flag fetch: it
         // carries the same anonymous install id, and flags then use their
         // built-in defaults.
-        if !isRunningUnderXCTest, !ManagedDevicePolicy().isEnforced(.disableTelemetry) {
+        if telemetryEnabled, !isRunningUnderXCTest, !ManagedDevicePolicy().isEnforced(.disableTelemetry) {
             CmuxFeatureFlags.shared.start()
         }
 
