@@ -10,15 +10,15 @@ HyprMux is a fork of [cmux](https://github.com/manaflow-ai/cmux) (Ghostty
 terminals, the bonsplit pane library). The upstream README is kept as
 [`README.cmux.md`](README.cmux.md). License: GPL-3.0-or-later, as upstream.
 
-```
-┌ 1  2  work.1  work.2 ───────── title ─────── ◉ ◉ ● 🔔 🎨 +  Fri 17 Oct 11:23 ┐   top bar
-│ ┌──────────────┬───────────────┐                                              │
-│ │              │               │   terminals tile like Hyprland's dwindle     │
-│ │              ├───────┬───────┤   layout, over your wallpaper                │
-│ └──────────────┴───────┴───────┘                                              │
-├ [alpha] [beta] [gamma] [delta] …                         dock (layers)       ┤   bottom bar
-└──────────────────────────────────────────────────────────────────────────────┘
-```
+<p align="center">
+  <img src="./docs/assets/hyprmux-screenshot.png" alt="HyprMux: a waybar-style top bar, three dwindle-tiled terminals, and the project dock" width="900" />
+</p>
+
+<p align="center">
+  <img src="./docs/assets/hyprmux-demo.gif" alt="Opening a project, a browser pane, agent status icons and switching workspaces" width="900" />
+</p>
+
+<sub>Demo content only: a throwaway profile and a sample repo, captured from an isolated instance (see `HYPRMUX_HOME` below).</sub>
 
 ## Contents
 
@@ -59,6 +59,9 @@ files it shows placeholder projects (`alpha` … `lambda`) and runs local shells
 | `~/.claude-badges.log` (on each machine) | Agent events: `<session> busy\|ask\|done` | live |
 | `~/.config/ghostty/config` | Terminal theme (written by the theme picker) | live |
 | `~/Pictures/wallpapers/*.{png,jpg,jpeg,webp,heic}` | Wallpaper library | on cycle |
+
+Set `HYPRMUX_HOME=/some/folder` to make HyprMux read all of the above from that folder
+instead of your home folder (a throwaway profile for demos or screenshots, for example).
 
 The directory name `agentic-laptop` is historical: HyprMux uses the same
 profile as the Linux (Hyprland + waybar + Touch Bar) setup, so one profile

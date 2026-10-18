@@ -41,6 +41,20 @@ enum AgenticPalette {
     }
 }
 
+// MARK: - Home
+
+/// Where HyprMux reads its files (bar.toml, fleet, wallpapers, the agent log, the
+/// terminal theme). Your home folder, unless HYPRMUX_HOME points elsewhere --
+/// used to run a demo instance that never sees your real profile.
+enum AgenticHome {
+    static let url: URL = {
+        if let path = ProcessInfo.processInfo.environment["HYPRMUX_HOME"], !path.isEmpty {
+            return URL(fileURLWithPath: path, isDirectory: true)
+        }
+        return FileManager.default.homeDirectoryForCurrentUser
+    }()
+}
+
 // MARK: - Projects
 
 /// One named project: a workspace, its chord (Cmd+Shift+<key>) and a colour.
@@ -64,7 +78,7 @@ struct AgenticCommandButton { let text: String; let icon: String?; let exec: Str
 /// same file the Linux dock reads. Projects, customers, machines and the
 /// tool buttons all come from it; without it the placeholder table applies.
 enum AgenticProfile {
-    static let directory = FileManager.default.homeDirectoryForCurrentUser
+    static let directory = AgenticHome.url
         .appendingPathComponent(".config/agentic-laptop")
 
     private struct Parsed {
@@ -116,7 +130,7 @@ enum AgenticProfile {
                 } else if section == "PrimaryLayerKeys", let exec = field("Exec", in: line) {
                     out.commands.append(AgenticCommandButton(
                         text: label, icon: icon,
-                        exec: exec.replacingOccurrences(of: "$HOME", with: NSHomeDirectory()),
+                        exec: exec.replacingOccurrences(of: "$HOME", with: AgenticHome.url.path),
                         key: actionKey(in: line) ?? ""
                     ))
                 }
@@ -157,14 +171,14 @@ enum AgenticProfile {
     /// The first node in the fleet file, or $AGENTIC_REMOTE: where `r` attaches.
     static var remoteHost: String? {
         if let env = ProcessInfo.processInfo.environment["AGENTIC_REMOTE"], !env.isEmpty { return env }
-        let fleet = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".config/claude-badged/fleet")
+        let fleet = AgenticHome.url.appendingPathComponent(".config/claude-badged/fleet")
         return (try? String(contentsOf: fleet, encoding: .utf8))?
             .split(separator: "\n").first.map(String.init)
     }
 
     /// Every host in the fleet file.
     static var fleet: [String] {
-        let url = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".config/claude-badged/fleet")
+        let url = AgenticHome.url.appendingPathComponent(".config/claude-badged/fleet")
         return (try? String(contentsOf: url, encoding: .utf8))?.split(whereSeparator: \.isWhitespace).map(String.init) ?? []
     }
 
@@ -804,7 +818,7 @@ extension AgenticActions {
 /// a Catppuccin gradient stands in.
 enum AgenticWallpaper {
     static let key = "agentic.wallpaperPath"
-    static let library = FileManager.default.homeDirectoryForCurrentUser
+    static let library = AgenticHome.url
         .appendingPathComponent("Pictures/wallpapers")
 
     static func list() -> [String] {
@@ -1055,7 +1069,7 @@ final class AgenticAgents: ObservableObject {
                                          "exec tail -n 0 -F ~/.claude-badges.log"]
                 } else {
                     process.executableURL = URL(fileURLWithPath: "/usr/bin/tail")
-                    process.arguments = ["-n", "0", "-F", NSHomeDirectory() + "/.claude-badges.log"]
+                    process.arguments = ["-n", "0", "-F", AgenticHome.url.path + "/.claude-badges.log"]
                 }
                 process.standardOutput = pipe
                 process.standardError = FileHandle.nullDevice
@@ -1172,7 +1186,7 @@ enum AgenticTheme {
     static let choices = ["Catppuccin Mocha", "Tokyo Night", "Gruvbox Dark", "Dracula", "Nord", "Rose Pine"]
     private static let key = "agentic.terminalTheme"
     private static var file: URL {
-        FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".config/ghostty/config")
+        AgenticHome.url.appendingPathComponent(".config/ghostty/config")
     }
 
     static var current: String {
